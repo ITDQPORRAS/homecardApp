@@ -14,6 +14,7 @@
 				>
 					<keep-alive>
 						<q-card
+							flat
 							v-bind:style="
 								!$q.platform.is.mobile ? 'width: 500px' : 'height:100%'
 							"

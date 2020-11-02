@@ -1,9 +1,3 @@
 <template>
-  <q-page class="flex flex-center">sample</q-page>
+  <router-view />
 </template>
-
-<script>
-export default {
-  name: "PageIndex"
-};
-</script>

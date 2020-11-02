@@ -1,41 +1,86 @@
-import Vue from 'vue'
+import Vue from 'vue';
 import VueRouter from 'vue-router'
+// import Layout from '@/layouts/MainLayout';
+Vue.use(VueRouter);
 
-import routess from './routes'
-import qr from './module/qr'
-import dashboard from './module/dashboard'
-// import scheduled from './module/scheduled'
-import Admin from './module/Admin'
 
-// const whiteList = ['/login', '/auth-redirect', '/reset-password', '/reset-password/:token'];
-import store from 'src/store';
-Vue.use(VueRouter)
+import Mod_QR from './module/Mod_QR';
 
-/*
- * If not building with SSR mode, you can
- * directly export the Router instantiation;
- *
- * The function below can be async too; either use
- * async/await or return a Promise which resolves
- * with the Router instance.
- */
-export const constantRoutes = [];
-export const AllRoute = [
-    routess,
-    qr,
-    // scheduled,
-    dashboard,
-    Admin
+
+export const constantRoutes = [
+
+    {
+        path: '/',
+        name: '/',
+        component: () =>
+            import ('layouts/MainLayout.vue'),
+        children: [{
+            path: '/',
+            component: () =>
+                import ('layouts/home')
+        }, ],
+        hidden: true,
+    },
+    {
+        path: '/home',
+        name: 'home',
+        component: () =>
+            import ('layouts/MainLayout.vue'),
+        children: [{
+            path: '/home',
+            component: () =>
+                import ('layouts/home')
+        }, ],
+        hidden: true,
+    },
+    {
+        path: '/login',
+        title: 'login',
+        name: 'Login',
+        component: () =>
+            import ('layouts/login'),
+
+        hidden: true,
+    },
+    {
+        path: '/reset-password',
+        title: 'Reset Password',
+        name: 'reset-password-form',
+        component: () =>
+            import ('layouts/reset'),
+
+        hidden: true,
+        props: true
+    },
+
+    {
+        path: '/redirect',
+        title: 'redirect',
+        component: () =>
+            import ('layouts/blank'),
+        hidden: true,
+        children: [{
+            path: '/redirect/:path*',
+            component: () =>
+                import ('layouts/redirect'),
+        }, ],
+    },
+    {
+        path: '*',
+        component: () =>
+            import ('pages/Error404.vue'),
+        hidden: true,
+    }
 ];
-AllRoute.forEach(element => {
-    element.forEach(el => {
-        constantRoutes.push(el)
+
+export const asyncRoutes = [
+    Mod_QR
+];
+
+export default function() {
+    asyncRoutes.forEach(element => {
+        constantRoutes.push(element)
     });
-});
-export const allRoutes = [
-    constantRoutes
-]
-export default function( /* { store, ssrContext } */ ) {
     const Router = new VueRouter({
         scrollBehavior: () => ({ x: 0, y: 0 }),
         routes: constantRoutes,

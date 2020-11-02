@@ -1,4 +1,4 @@
-import { AllRoute, constantRoutes } from 'src/router';
+import { asyncRoutes, constantRoutes } from 'src/router';
 
 /**
  * Check if it matches the current user right by meta.role
@@ -7,27 +7,27 @@ import { AllRoute, constantRoutes } from 'src/router';
  * @param route
  */
 function canAccess(roles, permissions, route) {
-  if (route.meta) {
-    let hasRole = true;
-    let hasPermission = true;
-    if (route.meta.roles || route.meta.permissions) {
-      // If it has meta.roles or meta.permissions, accessible = hasRole || permission
-      hasRole = false;
-      hasPermission = false;
-      if (route.meta.roles) {
-        hasRole = roles.some(role => route.meta.roles.includes(role));
-      }
+    if (route.meta) {
+        let hasRole = true;
+        let hasPermission = true;
+        if (route.meta.roles || route.meta.permissions) {
+            // If it has meta.roles or meta.permissions, accessible = hasRole || permission
+            hasRole = false;
+            hasPermission = false;
+            if (route.meta.roles) {
+                hasRole = roles.some(role => route.meta.roles.includes(role));
+            }
 
-      if (route.meta.permissions) {
-        hasPermission = permissions.some(permission => route.meta.permissions.includes(permission));
-      }
+            if (route.meta.permissions) {
+                hasPermission = permissions.some(permission => route.meta.permissions.includes(permission));
+            }
+        }
+
+        return hasRole || hasPermission;
     }
 
-    return hasRole || hasPermission;
-  }
-
-  // If no meta.roles/meta.permissions inputted - the route should be accessible
-  return true;
+    // If no meta.roles/meta.permissions inputted - the route should be accessible
+    return true;
 }
 
 /**
@@ -36,56 +36,56 @@ function canAccess(roles, permissions, route) {
  * @param roles
  */
 function filterAsyncRoutes(routes, roles, permissions) {
-  const res = [];
+    const res = [];
 
-  routes.forEach(route => {
-    const tmp = { ...route };
-    if (canAccess(roles, permissions, tmp)) {
-      if (tmp.children) {
-        tmp.children = filterAsyncRoutes(
-          tmp.children,
-          roles,
-          permissions
-        );
-      }
-      res.push(tmp);
-    }
-  });
+    routes.forEach(route => {
+        const tmp = {...route };
+        if (canAccess(roles, permissions, tmp)) {
+            if (tmp.children) {
+                tmp.children = filterAsyncRoutes(
+                    tmp.children,
+                    roles,
+                    permissions
+                );
+            }
+            res.push(tmp);
+        }
+    });
 
-  return res;
+    return res;
 }
 
 const state = {
-  routes: [],
-  addRoutes: [],
+    routes: [],
+    addRoutes: [],
 };
 
 const mutations = {
-  SET_ROUTES: (state, routes) => {
-    state.addRoutes = routes;
-    state.routes = constantRoutes.concat(routes);
-  },
+    SET_ROUTES: (state, routes) => {
+        state.addRoutes = routes;
+        state.routes = constantRoutes.concat(routes);
+    },
 };
 
 const actions = {
-  generateRoutes({ commit }, { roles, permissions }) {
-    return new Promise(resolve => {
-      let accessedRoutes;
-      if (roles.includes('admin')) {
-        accessedRoutes = asyncRoutes;
-      } else {
-        accessedRoutes = filterAsyncRoutes(AllRoute, roles, permissions);
-      }
+    generateRoutes({ commit }, { roles, permissions }) {
+        return new Promise(resolve => {
+            let accessedRoutes;
+            if (roles.includes('admin')) {
+                accessedRoutes = asyncRoutes;
+            } else {
+                accessedRoutes = filterAsyncRoutes(AllRoute, roles, permissions);
+            }
 
-      commit('SET_ROUTES', accessedRoutes);
-      resolve(accessedRoutes);
-    });
-  },
+            commit('SET_ROUTES', accessedRoutes);
+            resolve(accessedRoutes);
+        });
+    },
 };
 
 export default {
-  namespaced: true,
-  state,
-  mutations,
-  actions,
+    namespaced: true,
+    state,
+    mutations,
+    actions,
 };

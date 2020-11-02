@@ -144,6 +144,7 @@ export default {
 							const { data } = await datax.store(this.loginForm);
 							// this.$message({ message: data.Message, type: data.status });
 							this.$q.notify(JSON.stringify(data.Message));
+							EventBus.$emit("login");
 							this.loading = false;
 						}
 					}

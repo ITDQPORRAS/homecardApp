@@ -27,7 +27,7 @@
 								:data="barangay"
 								dense
 								:filter="search"
-								:rows-per-page-options="[200, 300]"
+								:rows-per-page-options="[40, 80]"
 								row-key="idx"
 								@row-click="onRowClick"
 								hide-top
@@ -117,6 +117,8 @@
 							:rows-per-page-options="[20, 40]"
 							row-key="idx"
 							@selection="onSelection"
+							selection="multiple"
+							:selected.sync="selected"
 						>
 							<template v-slot:top-left>
 								<div class="text-subtitle2">{{ BarangayName }}</div>
@@ -261,8 +263,8 @@ export default {
 			purokName: { id: "%", purok: "All" },
 			dlgfilter: false,
 			dlgMember: false,
-			locations: "http://18.221.253.87/HomeCardBackend/public/",
-			// locations: "http://3.20.55.147/",
+			// locations: "http://localhost:8000/quasar/backends_qr/public/",
+			locations: "http://3.20.55.147/",
 			showIndi: false,
 			selected: [],
 			brgy_id: 0,
@@ -583,6 +585,10 @@ export default {
 			var rv = {};
 			for (var i = 0; i < arr.length; ++i) this.purok.push(arr[i]);
 			return rv;
+		},
+		onRowClick(evt, row) {
+			// this.$emit("selected", row);
+			this.showName(row);
 		},
 	},
 	watch: {

@@ -64,7 +64,18 @@
 				<div class="col-12 col-md-12">
 					<h1>or</h1>
 				</div>
-				<div class="col-12 col-md-12 q-pt-md">
+
+				<div class="col-12 col-md-12 q-pt-xs">
+					<GoogleLogin
+						class="google-signin-button"
+						style="width: 100%"
+						:params="params"
+						:onSuccess="onSuccess"
+						:onFailure="onFailure"
+						>Login with Google</GoogleLogin
+					>
+				</div>
+				<div class="col-12 col-md-12 q-pt-sm">
 					<div class="text-center">
 						No account yet?
 						<em class="text-primary">
@@ -80,9 +91,25 @@
 <script>
 import { csrf } from "src/api/auth";
 import EventBus from "./events";
+import GoogleLogin from "vue-google-login";
 export default {
+	components: {
+		GoogleLogin,
+	},
 	data() {
 		return {
+			clientId:
+				"990735916129-571uifuljrj6rm35jiltsqpk03kdfc1e.apps.googleusercontent.com",
+			params: {
+				client_id:
+					"990735916129-571uifuljrj6rm35jiltsqpk03kdfc1e.apps.googleusercontent.com",
+			},
+			// only needed if you want to render the button with the google ui
+			renderParams: {
+				width: 250,
+				height: 50,
+				longtitle: true,
+			},
 			tab: "login",
 			card: true,
 			loginForm: {
@@ -95,6 +122,24 @@ export default {
 		};
 	},
 	methods: {
+		OnGoogleAuthSuccess(idToken) {
+			console.log(idToken);
+			// Receive the idToken and make your magic with the backend
+		},
+		OnGoogleAuthFail(error) {
+			console.log(error);
+		},
+		onFailure(googleUser) {
+			console.log(googleUser);
+
+			// This only gets the user information: id, name, imageUrl and email
+		},
+		onSuccess(googleUser) {
+			console.log(googleUser);
+
+			// This only gets the user information: id, name, imageUrl and email
+			console.log(googleUser.getBasicProfile());
+		},
 		forgot() {
 			EventBus.$emit("reset");
 		},
@@ -111,14 +156,13 @@ export default {
 				this.$q.loading.show();
 				this.$store
 					.dispatch("user/login", this.loginForm)
-					.then(() => {
-						this.$router.push(
-							{ path: this.redirect || "/", query: this.otherQuery },
-							(onAbort) => {}
-						);
+					.then(async () => {
+						await this.$store.dispatch("user/getInfo").then(() => {
+							this.$router.push("/");
+							this.$q.loading.hide();
+						});
 						this.$q.loading.hide();
 						this.loading = false;
-						this.$store.dispatch("user/getInfo");
 					})
 					.catch(() => {
 						this.$q.loading.hide();
@@ -176,5 +220,16 @@ h1:after {
 
 #footer {
 	clear: left;
+}
+
+.google-signin-button {
+	display: inline-block;
+	background: white;
+	color: #444;
+	width: 190px;
+	border-radius: 5px;
+	border: thin solid #888;
+	box-shadow: 1px 1px 1px grey;
+	white-space: nowrap;
 }
 </style>

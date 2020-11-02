@@ -1,4 +1,4 @@
-import { login, logout, getInfo, access } from 'src/api/auth';
+import { login, logout, getInfo, access, insertform } from 'src/api/auth';
 import { getToken, setToken, removeToken } from 'src/utils/auth';
 import router from 'src/router';
 import store from 'src/store';
@@ -12,7 +12,8 @@ const state = {
     roles: [],
     permissions: [],
     userName: '',
-    access: false,
+    access: [],
+    isAdmin: 0,
 };
 
 const mutations = {
@@ -43,16 +44,32 @@ const mutations = {
     SET_PERMISSIONS: (state, permissions) => {
         state.permissions = permissions;
     },
+    SET_ADMIN: (state, data) => {
+        state.isAdmin = data;
+    },
 };
 
 const actions = {
+    insertform({ commit }, datax) {
+        return new Promise((resolve, reject) => {
+            insertform(datax)
+                .then(response => {
+                    resolve(response);
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
+    },
     // user login
     login({ commit }, userInfo) {
         const { email, password } = userInfo;
         return new Promise((resolve, reject) => {
             login({ email: email.trim(), password: password })
                 .then(response => {
+                    LocalStorage.set("routes", response.data.access);
                     commit('SET_TOKEN', response.data.token);
+                    commit('SET_ACCESS', response.data.access);
                     // console.log(response.data.token)
                     setToken(response.data.token);
                     resolve(response);
@@ -66,7 +83,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             access()
                 .then(response => {
-                    commit('SET_ACCESS', response);
+                    // commit('SET_ACCESS', response);
                     resolve(response);
                 })
                 .catch(error => {
@@ -84,27 +101,27 @@ const actions = {
                     if (!data) {
                         reject('Verification failed, please Login again.');
                     }
-                    LocalStorage.set("info", data);
-                    const { name, avatar, id, email } = data;
+                    const { name, avatar, id, email, admin } = data;
                     // roles must be a non-empty array
                     // if (!roles || roles.length <= 0) {
                     //   reject('getInfo: roles must be a non-null array!');
                     // }
-                    // commit('SET_ROLES', roles);
-                    // commit('SET_PERMISSIONS', permissions);
+                    LocalStorage.set("info", data);
                     commit('SET_NAME', name);
                     commit('SET_AVATAR', avatar);
                     // commit('SET_INTRODUCTION', introduction);
                     commit('SET_ID', id)
+                    commit('SET_ADMIN', admin)
+
                     commit('SET_USERNAME', email);
                     resolve(data);
+
                 })
                 .catch(error => {
                     reject(error);
                 });
         });
     },
-
     // user logout
     logout({ commit, state }) {
         return new Promise((resolve, reject) => {
@@ -119,7 +136,6 @@ const actions = {
                 });
         });
     },
-
     // remove token
     resetToken({ commit }) {
         return new Promise(resolve => {
@@ -128,7 +144,6 @@ const actions = {
             resolve();
         });
     },
-
     // Dynamically modify permissions
     changeRoles({ commit, dispatch }, role) {
         return new Promise(async resolve => {

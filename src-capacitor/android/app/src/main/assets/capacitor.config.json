@@ -1,6 +1,6 @@
 {
   "appId": "org.capacitor.quasar.app",
-  "appName": "QR",
+  "appName": "Household Multipurpose E-Card",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www"
