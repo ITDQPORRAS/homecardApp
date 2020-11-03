@@ -65,15 +65,40 @@
 					<h1>or</h1>
 				</div>
 
-				<div class="col-12 col-md-12 q-pt-xs">
+				<!-- <div class="col-12 col-md-12 q-pt-xs">
 					<GoogleLogin
 						class="google-signin-button"
 						style="width: 100%"
 						:params="params"
 						:onSuccess="onSuccess"
 						:onFailure="onFailure"
-						>Login with Google</GoogleLogin
 					>
+						<b>Sign in with google</b>
+					</GoogleLogin>
+				</div> -->
+				<div class="col-12 col-md-12">
+					<q-btn
+						@click="auth('facebook')"
+						color="primary"
+						style="width: 100%"
+						class="full-width"
+						icon="fab fa-facebook-f"
+						label="Login with Facebook"
+						size="md"
+					>
+					</q-btn>
+				</div>
+				<div class="col-12 col-md-12 q-pt-sm">
+					<q-btn
+						@click="authGoogle('google')"
+						color="negative"
+						style="width: 100%"
+						class="full-width"
+						icon="fab fa-google"
+						label="Login with Google"
+						size="md"
+					>
+					</q-btn>
 				</div>
 				<div class="col-12 col-md-12 q-pt-sm">
 					<div class="text-center">
@@ -91,10 +116,10 @@
 <script>
 import { csrf } from "src/api/auth";
 import EventBus from "./events";
-import GoogleLogin from "vue-google-login";
+// import GoogleLogin from "vue-google-login";
 export default {
 	components: {
-		GoogleLogin,
+		// GoogleLogin,
 	},
 	data() {
 		return {
@@ -122,6 +147,20 @@ export default {
 		};
 	},
 	methods: {
+		authGoogle(network) {
+			this.$hello(network)
+				.login()
+				.then((res) => {
+					console.log(res);
+				});
+		},
+		auth(network) {
+			this.$hello(network)
+				.login({ scope: "friends" })
+				.then((res) => {
+					console.log(res);
+				});
+		},
 		OnGoogleAuthSuccess(idToken) {
 			console.log(idToken);
 			// Receive the idToken and make your magic with the backend
@@ -221,15 +260,32 @@ h1:after {
 #footer {
 	clear: left;
 }
+.google-icon {
+	position: absolute;
+	margin-top: 11px;
+	margin-left: 11px;
+	width: 18px;
+	height: 18px;
+}
 
 .google-signin-button {
 	display: inline-block;
 	background: white;
-	color: #444;
 	width: 190px;
-	border-radius: 5px;
-	border: thin solid #888;
-	box-shadow: 1px 1px 1px grey;
+	border-radius: 15px;
+	height: 35px;
 	white-space: nowrap;
+	background-color: #dd4b39;
+	color: white;
+}
+
+.google-icon-wrapper {
+	position: absolute;
+	margin-top: 1px;
+	margin-left: 1px;
+	width: 40px;
+	height: 40px;
+	border-radius: 2px;
+	background-color: #fff;
 }
 </style>

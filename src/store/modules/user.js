@@ -125,15 +125,23 @@ const actions = {
     // user logout
     logout({ commit, state }) {
         return new Promise((resolve, reject) => {
-            logout()
-                .then(() => {
-                    commit('SET_TOKEN', '');
-                    removeToken();
-                    resolve();
-                })
-                .catch(error => {
-                    reject(error);
-                });
+            if (state.token) {
+                logout(state.token)
+                    .then(() => {
+                        commit('SET_TOKEN', '');
+                        this.$router.push(`/login`);
+                        removeToken();
+                        resolve();
+                    })
+                    .catch(error => {
+                        this.$router.push(`/login`);
+                        reject(error);
+                    });
+            } else {
+                removeToken();
+                commit('SET_TOKEN', '');
+                this.$router.push(`/login`);
+            }
         });
     },
     // remove token

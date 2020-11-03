@@ -246,7 +246,7 @@ export default {
 	components: { themes, skelProfile, info },
 	data() {
 		return {
-			showLoading: true,
+			showLoading: false,
 			fixedHeader: this.$q.localStorage.getItem("fixedHeader") || false,
 			dlgthemes: false,
 			profile: false,
@@ -303,12 +303,18 @@ export default {
 		this.islogin = this.userId;
 		this.loadRoutes();
 		this.ModuleGroup = this.$q.localStorage.getItem("ModuleGroup") || [];
-		await this.chechAuth();
+		await this.chechAuth()
+			.then(() => {
+				this.showLoading = false;
+			})
+			.catch(() => {
+				this.showLoading = false;
+			});
 		// await store.dispatch("global/getData");
 		// await this.$store.dispatch("user/getInfo");
 		// this.showLoaded();
 		this.showMenu();
-		this.showLoading = false;
+
 		// this.update_route();
 	},
 	methods: {
@@ -479,6 +485,7 @@ export default {
 		},
 	},
 	created() {
+		this.loadRoutes();
 		window.addEventListener(
 			"beforeunload",
 			async () => {
