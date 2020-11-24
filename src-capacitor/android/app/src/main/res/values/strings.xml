@@ -4,4 +4,5 @@
     <string name="title_activity_main">HoMe Card</string>
     <string name="package_name">org.capacitor.quasar.app</string>
     <string name="custom_url_scheme">org.capacitor.quasar.app</string>
+    <string name="server_client_id">D0Dr4vNGjEZQrBrRQ56RC6mA</string>
 </resources>

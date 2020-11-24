@@ -22,5 +22,6 @@ const getters = {
     populations: state => state.global.population,
     showAppointed: state => state.global.showAppointed,
     DepartmentList: state => state.global.DepartmentList,
+    facilityName: state => state.user.facilityName,
 };
 export default getters;

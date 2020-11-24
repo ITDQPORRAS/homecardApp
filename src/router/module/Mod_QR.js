@@ -89,6 +89,13 @@ const Mod_QR = {
                     name: '/covidStatus',
                     meta: { title: 'Covid Status', icon: 'bug_report', requiresAuth: true, access: ['initiate'] },
                 },
+                {
+                    path: '/Tracker',
+                    component: () =>
+                        import ('pages/dashboard/covidTracker'),
+                    name: '/Tracker',
+                    meta: { title: 'Contact Tracing', icon: 'scatter_plot', requiresAuth: true, access: ['initiate'] },
+                },
 
             ],
         },
@@ -99,6 +106,20 @@ const Mod_QR = {
             name: '/Admin',
             meta: { title: 'Admin', icon: 'group' },
             children: [{
+                    path: '/barangay',
+                    component: () =>
+                        import ('pages/Admin/Barangay'),
+                    name: 'Barangay',
+                    meta: { title: 'Barangay', icon: 'explore', requiresAuth: true, access: ['initiate', 'save', 'update', 'view'] },
+                },
+                {
+                    path: '/facility',
+                    component: () =>
+                        import ('pages/Admin/Facility'),
+                    name: 'Barangay',
+                    meta: { title: 'Facility', icon: 'business', requiresAuth: true, access: ['initiate', 'save', 'update', 'view'] },
+                },
+                {
                     path: '/UserMonitoring',
                     component: () =>
                         import ('pages/Admin/User'),

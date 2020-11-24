@@ -11,96 +11,13 @@
 					narrow-indicator
 					inline-label
 				>
-					<q-tab name="barangay" label="Barangay" />
-					<q-tab name="list" label="Persons" />
+					<q-tab name="barangay" label="Add Member" />
+					<q-tab name="list" label="Members" />
 				</q-tabs>
 				<q-separator />
 				<q-tab-panels v-model="tab" animated>
 					<q-tab-panel name="barangay">
-						<q-pull-to-refresh @refresh="refresh" icon="autorenew">
-							<q-table
-								class="my-sticky-header-table"
-								flat
-								bordered
-								:loading="loading"
-								:columns="headers"
-								:data="barangay"
-								dense
-								:filter="search"
-								:rows-per-page-options="[40, 80]"
-								row-key="idx"
-								@row-click="onRowClick"
-								hide-top
-							>
-								<template v-slot:top-left>
-									<q-btn
-										color="primary"
-										icon-right="archive"
-										label="Export to csv"
-										no-caps
-										@click="exportTable"
-									/>
-								</template>
-								<template v-slot:body-cell-actions="props">
-									<q-td :props="props">
-										<div class="col-auto">
-											<q-btn
-												@click="showName(props.row)"
-												color="grey-7"
-												size="sm"
-												round
-												flat
-												icon="arrow_forward_ios"
-											></q-btn>
-										</div>
-									</q-td>
-								</template>
-								<template v-slot:top-right>
-									<q-input
-										dense
-										rounded
-										debounce="500"
-										style="width: 150px"
-										v-model="search"
-										placeholder="Search"
-									>
-										<template v-slot:append>
-											<q-icon name="search" />
-										</template>
-									</q-input>
-								</template>
-								<template v-slot:bottom-row>
-									<q-tr>
-										<q-td class="text-subtitle2">
-											<b>TOTAL</b>
-										</q-td>
-										<q-td class="text-right">
-											<b>
-												{{
-													sumField("housecount")
-														.toFixed(0)
-														.toString()
-														.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-												}}
-											</b>
-										</q-td>
-										<q-td class="text-right">
-											<b>
-												{{
-													sumField("withmembers")
-														.toFixed(0)
-														.toString()
-														.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-												}}
-											</b>
-										</q-td>
-
-										<q-td class="text-right"></q-td>
-									</q-tr>
-								</template>
-								<template v-slot:bottom></template>
-							</q-table>
-						</q-pull-to-refresh>
+						<entry />
 					</q-tab-panel>
 
 					<q-tab-panel name="list">
@@ -232,6 +149,7 @@
 	</q-page>
 </template>
 <script>
+import entry from "./entry";
 import { exportFile } from "quasar";
 import Resource from "src/api/resource";
 import { mapGetters } from "vuex";
@@ -253,9 +171,22 @@ export default {
 		filterx,
 		dlg,
 		member,
+		entry,
 	},
 	data() {
 		return {
+			form: {
+				lastName: "",
+				firstName: "",
+				middleName: null,
+				suffix: null,
+				birthdate: "",
+				gender: "",
+				members_id: null,
+				client_guid: null,
+				member_type: null,
+				contact_number: null,
+			},
 			reference: [],
 			MemberTitle: null,
 			datax: [],
@@ -263,8 +194,8 @@ export default {
 			purokName: { id: "%", purok: "All" },
 			dlgfilter: false,
 			dlgMember: false,
-			locations: "http://localhost:1111/",
-			// locations: "http://18.221.253.87/HomeCardBackend/public/",
+			// locations: "http://localhost:8000/quasar/backends_qr/public/",
+			locations: "http://18.221.253.87/HomeCardBackend/public/",
 			showIndi: false,
 			selected: [],
 			brgy_id: 0,

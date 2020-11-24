@@ -29,9 +29,12 @@ module.exports = function( /* ctx */ ) {
             'moment',
             'qriously',
             'numeral',
-            'socket',
+            // 'socket',
             'components',
-            'hello'
+            'hello',
+            'vuesocialite',
+            'login',
+            'map'
             // 'main'
         ],
 
@@ -80,6 +83,11 @@ module.exports = function( /* ctx */ ) {
 
             // https://quasar.dev/quasar-cli/handling-webpack
             extendWebpack(cfg) {
+                cfg.plugins.push(
+                    new webpack.ProvidePlugin({
+                        mapboxgl: "mapbox-gl"
+                    })
+                );
                 cfg.module.rules.push({
                     enforce: 'pre',
                     test: /\.(js|vue)$/,
@@ -97,7 +105,7 @@ module.exports = function( /* ctx */ ) {
         // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
         devServer: {
             https: false,
-            port: 8080,
+            port: 7777,
             open: true // opens browser window automatically
         },
 

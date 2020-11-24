@@ -22,6 +22,19 @@ export const constantRoutes = [
         hidden: true,
     },
     {
+        path: '/authcallback',
+        name: '/authcallback',
+        component: () =>
+            import ('layouts/MainLayout.vue'),
+        children: [{
+            path: '/',
+            component: () =>
+                import ('layouts/home')
+        }, ],
+        hidden: true,
+    },
+
+    {
         path: '/home',
         name: 'home',
         component: () =>
@@ -41,6 +54,18 @@ export const constantRoutes = [
             import ('layouts/login'),
 
         hidden: true,
+    },
+    {
+        path: '/profile',
+        title: 'profile',
+        name: 'profile',
+        component: () =>
+            import ('layouts/MainLayout.vue'),
+        children: [{
+            path: '/',
+            component: () =>
+                import ('layouts/profile')
+        }]
     },
     {
         path: '/reset-password',

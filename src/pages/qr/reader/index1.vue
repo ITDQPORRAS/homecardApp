@@ -1,47 +1,24 @@
 <template>
   <q-page class="row full-height items-center">
     <div class="col text-center q-pa-sm">
-      <div class="row">
-        <div v-show="facilityName ==='LGU'" class="col-12 col-md-12 q-pb-md">
-          <q-select
-            ref="relation"
-            dense
-            v-model="v_department"
-            :options="departmentData"
-            option-value="id"
-            option-label="department"
-            label="Department"
-            stack-label
-            lazy-rules
-            map-options
-            emit-value
-            input-debounce="0"
-            use-input
-            @filter="filterDepartment"
-          />
-        </div>
-        <div v-show="facilityName ==='LGU'" class="col-12 col-md-12">
-          <div v-if="notallowed" class="text-h6" color="red">
-            <!-- <b>Not Allowed!</b> -->
-            <q-btn flat style="color: #FF0080" label="Not Allowed!" />
-          </div>
-        </div>
-        <div class="col-12 col-md-12">
-          <q-btn
-            color="primary"
-            rounded
-            icon="camera_alt"
-            label="Read QRCode"
-            size="lg"
-            @click="turnCameraOn()"
-            v-show="!showCamera"
-          >
-            <q-inner-loading :showing="loading">
-              <q-spinner-gears size="20px" color="primary" />
-            </q-inner-loading>
-          </q-btn>
-        </div>
+      <div v-if="notallowed" class="text-h6" color="red">
+        <!-- <b>Not Allowed!</b> -->
+        <q-btn flat style="color: #FF0080" label="Not Allowed!" />
       </div>
+
+      <q-btn
+        color="primary"
+        rounded
+        icon="camera_alt"
+        label="Read QRCode"
+        size="lg"
+        @click="turnCameraOn()"
+        v-show="!showCamera"
+      >
+        <q-inner-loading :showing="loading">
+          <q-spinner-gears size="20px" color="primary" />
+        </q-inner-loading>
+      </q-btn>
 
       <div class="text-subtitle2" v-if="result">
         <q-btn @click="details" flat style="color: #FF0080" :label="lastlog" />
@@ -63,14 +40,12 @@
             </template>
             <q-item>
               <q-item-section avatar>
-                <q-avatar color="primary" text-color="white">{{i+1}}</q-avatar>
+                <q-avatar
+                  color="primary"
+                  text-color="white"
+                >{{ item.firstName.charAt(0) + item.lastName.charAt(0) }}</q-avatar>
               </q-item-section>
               <q-item-section>{{ item.firstName + " " + item.lastName}}</q-item-section>
-              <q-item-section avatar>
-                <q-avatar v-if="item.image">
-                  <img :src="item.image" />
-                </q-avatar>
-              </q-item-section>
             </q-item>
           </q-slide-item>
         </q-list>
@@ -92,7 +67,6 @@ import { QrcodeStream } from "vue-qrcode-reader";
 import Resource from "src/api/resource";
 import dlg from "#/dlg";
 import detailx from "./details";
-import { mapGetters } from "vuex";
 export default {
   name: "PageIndex",
   components: { QrcodeStream, dlg, detailx },
@@ -109,26 +83,19 @@ export default {
       dlgshow: false,
       showCommand: false,
       notallowed: false,
-      department: [],
-      departmentData: [],
-      v_department: null,
+
       location: null,
       gettingLocation: false,
       errorStr: null,
       locational: {
-        long: 0,
-        lat: 0,
+        long: null,
+        lat: null,
       },
-      showDepartment: false,
     };
   },
   methods: {
     async onLeft(item) {
-      const par = {
-        main: item,
-        location: this.locational,
-        department: this.v_department,
-      };
+      const par = { main: item, location: this.locational };
       const datax = new Resource("Reader/validated");
       const { data } = await datax.store(par);
       if (data.status === "sucess") {
@@ -136,23 +103,6 @@ export default {
         this.turnCameraOn();
       } else {
       }
-      if (this.v_department > 0) {
-        this.$socket.client.emit("sendEntered", this.v_department);
-      }
-    },
-    filterDepartment(val, update) {
-      if (val === "") {
-        update(() => {
-          this.departmentData = this.department;
-        });
-        return;
-      }
-      update(() => {
-        const needle = val.toLowerCase();
-        this.departmentData = this.department.filter(
-          (v) => v.department.toLowerCase().indexOf(needle) > -1
-        );
-      });
     },
     onRight(item) {
       // alert("right");
@@ -163,13 +113,7 @@ export default {
         reset();
       }, 1000);
     },
-    async getDepartment() {
-      const { data } = await new Resource("Reader/Departments").list();
-      this.department = data;
-    },
     async onDecode(content) {
-      var audio = new Audio("beep.mp3");
-      await audio.play();
       this.turnCameraOff();
       await this.getdata(content);
     },
@@ -192,17 +136,14 @@ export default {
         const datax = new Resource("Reader/show");
         const { data } = await datax.get(id);
         this.loading = false;
-        this.results = [];
+
         if (data.result.length > 0) {
           if (data.allowed.length !== 1) {
-            if (this.facilityName === "LGU") {
-            } else {
-              this.notallowed = true;
-              this.$q.notify({
-                type: "negative",
-                message: `Record not Allowed`,
-              });
-            }
+            this.notallowed = true;
+            this.$q.notify({
+              type: "negative",
+              message: `Record not Allowed`,
+            });
           }
           if (data.last) {
             this.lastlog = this.$moment(data.last.ts).fromNow();
@@ -221,10 +162,6 @@ export default {
           });
         }
       } catch (error) {
-        this.$q.notify({
-          type: "negative",
-          message: error,
-        });
         this.loading = false;
       }
     },
@@ -232,14 +169,15 @@ export default {
   },
   mounted() {
     // this.getLocation();
-    this.getDepartment();
   },
   created() {
+    //do we support geolocation
     if (!("geolocation" in navigator)) {
       this.errorStr = "Geolocation is not available.";
       return;
     }
     this.gettingLocation = true;
+    // get position
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         this.gettingLocation = false;
@@ -252,9 +190,6 @@ export default {
         this.errorStr = err.message;
       }
     );
-  },
-  computed: {
-    ...mapGetters(["facilityName"]),
   },
 };
 </script>

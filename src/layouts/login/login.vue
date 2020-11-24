@@ -26,19 +26,38 @@
 				<div class="col-12 col-md-12">
 					<q-input
 						ref="email"
+						outlined
+						v-model="loginForm.email"
+						label="Email"
+						stack-label
+						lazy-rules
+						:rules="[(val) => (val && val.length > 0) || 'Please input Email']"
+					>
+						<template v-slot:prepend>
+							<q-icon name="email" />
+						</template>
+					</q-input>
+
+					<!-- <q-input
+						:dense="$q.screen.lt.md"
+						ref="email"
 						color="primary"
 						v-model="loginForm.email"
 						label="Email"
 						lazy-rules
-					></q-input>
+						:rules="[(val) => (val && val.length > 0) || 'Please input Email']"
+					></q-input> -->
 				</div>
 				<div class="col-12 col-md-12">
-					<q-input
+					<!-- <q-input
 						ref="password"
 						color="primary"
 						v-model="loginForm.password"
 						:type="isPwd ? 'password' : 'text'"
 						label="Password"
+						:rules="[
+							(val) => (val && val.length > 0) || 'Please input password',
+						]"
 					>
 						<template v-slot:append>
 							<q-icon
@@ -47,18 +66,54 @@
 								@click="isPwd = !isPwd"
 							/>
 						</template>
+					</q-input> -->
+					<q-input
+						outlined
+						ref="password"
+						v-model="loginForm.password"
+						label="Password"
+						:type="isPwd ? 'password' : 'text'"
+						stack-label
+						size="sm"
+					>
+						<template v-slot:prepend>
+							<q-icon name="vpn_key" />
+						</template>
+						<template v-slot:append>
+							<q-icon
+								:name="isPwd ? 'visibility_off' : 'visibility'"
+								class="cursor-pointer"
+								@click="isPwd = !isPwd"
+							/>
+						</template>
 					</q-input>
+					<!-- <q-input outlined v-model="loginForm.password" label-slot clearable>
+						<template v-slot:prepend>
+							<q-avatar>
+								<img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
+							</q-avatar>
+						</template>
+
+						<template v-slot:label>
+							<strong class="text-deep-orange">You</strong>
+							can customize the
+							<em class="q-px-sm bg-deep-orange text-white rounded-borders"
+								>label</em
+							>
+						</template>
+					</q-input> -->
+
 					<a @click="forgot">
 						<a class="text-primary">Forgot Password?</a>
 					</a>
 				</div>
 				<div class="col-12 col-md-12 q-pt-lg">
 					<q-btn
-						rounded
 						@click="handleLogin"
 						style="width: 100%"
 						color="primary"
 						label="Login"
+						size="md"
 					/>
 				</div>
 				<div class="col-12 col-md-12">
@@ -76,7 +131,7 @@
 						<b>Sign in with google</b>
 					</GoogleLogin>
 				</div> -->
-				<div class="col-12 col-md-12">
+				<!-- <div class="col-12 col-md-12">
 					<q-btn
 						@click="auth('facebook')"
 						color="primary"
@@ -87,10 +142,10 @@
 						size="md"
 					>
 					</q-btn>
-				</div>
+				</div> -->
 				<div class="col-12 col-md-12 q-pt-sm">
 					<q-btn
-						@click="authGoogle('google')"
+						@click="auth('google')"
 						color="negative"
 						style="width: 100%"
 						class="full-width"
@@ -99,6 +154,7 @@
 						size="md"
 					>
 					</q-btn>
+					<!-- <btngoogle /> -->
 				</div>
 				<div class="col-12 col-md-12 q-pt-sm">
 					<div class="text-center">
@@ -108,6 +164,21 @@
 						</em>
 					</div>
 				</div>
+				<div class="col-12 col-md-12 q-pt-sm text-center">
+					<q-btn
+						flat
+						style="color: #ff0080"
+						label="<< Card >>"
+						@click="onProfile"
+					/>
+				</div>
+
+				<!-- <GoogleLogin
+					:params="params"
+					:onSuccess="onSuccess"
+					:onFailure="onFailure"
+					>Login</GoogleLogin
+				> -->
 			</div>
 		</div>
 		<br />
@@ -116,20 +187,21 @@
 <script>
 import { csrf } from "src/api/auth";
 import EventBus from "./events";
+import Resource from "@/api/resource";
+import btngoogle from "#/q-google";
 // import GoogleLogin from "vue-google-login";
 export default {
-	components: {
-		// GoogleLogin,
-	},
+	// components: {
+	// 	btngoogle,
+	// 	GoogleLogin,
+	// },
 	data() {
 		return {
-			clientId:
-				"990735916129-571uifuljrj6rm35jiltsqpk03kdfc1e.apps.googleusercontent.com",
 			params: {
 				client_id:
 					"990735916129-571uifuljrj6rm35jiltsqpk03kdfc1e.apps.googleusercontent.com",
 			},
-			// only needed if you want to render the button with the google ui
+
 			renderParams: {
 				width: 250,
 				height: 50,
@@ -147,19 +219,64 @@ export default {
 		};
 	},
 	methods: {
-		authGoogle(network) {
-			this.$hello(network)
-				.login()
-				.then((res) => {
-					console.log(res);
-				});
+		onProfile() {
+			// alert("sad");
+			EventBus.$emit("profile");
 		},
-		auth(network) {
+		async auth(network) {
+			// this.$axios
+			// 	.get("sign-in/google")
+			// 	.then((response) => {
+			// 		console.log(response.data);
+			// 	})
+			// 	.catch((err) => {
+			// 		console.log({ err: err });
+			// 	});
+
+			// this.$axios.get("/sign-in/google");
+			// const authRes = this.$hello(network).getAuthResponse();
+			// console.log(authRes);
 			this.$hello(network)
-				.login({ scope: "friends" })
-				.then((res) => {
-					console.log(res);
+				.login({
+					scope: "email",
+				})
+				.then(async (res) => {
+					// alert("sad");
+					// const authRes = this.$hello(network).getAuthResponse();
+					// console.log(authRes);
+					let par = {
+						grant_type: "social",
+						client_id: "5",
+						client_secret: "K3Nzngxw3yHOfEs95qtfr2gawOH4ZY2xFM7BWJe2",
+						provider: network,
+						access_token: res.authResponse.access_token,
+					};
+					this.$q.loading.show();
+					await new Resource("oauth/token").post(par).then(async (res) => {
+						this.$store.dispatch("user/setTokenz", res).then(async () => {
+							await this.$store.dispatch("user/getInfo").then(() => {
+								this.$router.push("/");
+								this.$q.loading.hide();
+							});
+						});
+					});
 				});
+
+			// this.$hello.on("auth.login", function (network) {
+			// 	// Call user information, for the given network
+			// 	hello(network)
+			// 		.api("me")
+			// 		.then(function (r) {
+			// 			// Inject it into the container
+			// 			var label = document.getElementById("profile_" + network);
+			// 			if (!label) {
+			// 				label = document.createElement("div");
+			// 				label.id = "profile_" + network;
+			// 				document.getElementById("profile").appendChild(label);
+			// 			}
+			// 			label.innerHTML = '<img src="' + r.thumbnail + '" /> Hey ' + r.name;
+			// 		});
+			// });
 		},
 		OnGoogleAuthSuccess(idToken) {
 			console.log(idToken);
@@ -174,10 +291,10 @@ export default {
 			// This only gets the user information: id, name, imageUrl and email
 		},
 		onSuccess(googleUser) {
-			console.log(googleUser);
+			console.log(googleUser.wc);
 
 			// This only gets the user information: id, name, imageUrl and email
-			console.log(googleUser.getBasicProfile());
+			// console.log(googleUser.getBasicProfile());
 		},
 		forgot() {
 			EventBus.$emit("reset");
@@ -203,7 +320,9 @@ export default {
 						this.$q.loading.hide();
 						this.loading = false;
 					})
-					.catch(() => {
+					.catch((er) => {
+						this.$q.notify(er);
+						// alert(er.error);
 						this.$q.loading.hide();
 					});
 			}
@@ -260,32 +379,14 @@ h1:after {
 #footer {
 	clear: left;
 }
-.google-icon {
-	position: absolute;
-	margin-top: 11px;
-	margin-left: 11px;
-	width: 18px;
-	height: 18px;
+.q-field__marginal {
+	height: 45px !important;
+	color: rgba(0, 0, 0, 0.54);
+	font-size: 24px;
 }
-
-.google-signin-button {
-	display: inline-block;
-	background: white;
-	width: 190px;
-	border-radius: 15px;
-	height: 35px;
-	white-space: nowrap;
-	background-color: #dd4b39;
-	color: white;
-}
-
-.google-icon-wrapper {
-	position: absolute;
-	margin-top: 1px;
-	margin-left: 1px;
-	width: 40px;
-	height: 40px;
-	border-radius: 2px;
-	background-color: #fff;
+.q-field__control {
+	height: 45px !important;
+	max-width: 100%;
+	outline: none;
 }
 </style>

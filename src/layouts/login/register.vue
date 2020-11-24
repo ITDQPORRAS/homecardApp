@@ -1,14 +1,53 @@
 <template>
 	<div>
+		<q-tlbr title="Register" @back="login"></q-tlbr>
 		<div class="q-pa-sm">
-			<q-tlbr title="Register" @back="login"></q-tlbr>
-			<div class="row">
+			<div class="row q-col-gutter-sm">
 				<div class="col-12 col-md-12">
+					<q-card flat class="column items-center">
+						<div id="content">
+							<div class="col">
+								<img src="icons/logo2.png" alt />
+							</div>
+							<div class="col q-pt-md">
+								<div class="text-h6 text-primary">HoMe Card</div>
+							</div>
+						</div>
+					</q-card>
+				</div>
+				<div class="col-12 col-md-6">
+					<q-select
+						dense
+						v-model="loginForm.brgy_id"
+						:options="barangay"
+						option-value="id"
+						option-label="brgy_name"
+						label="Barangay"
+						lazy-rules
+						emit-value
+						map-options
+						:rules="[
+							(val) =>
+								(val !== null && val !== '') || 'Please select a barangay',
+						]"
+					/>
+				</div>
+				<div class="col-12 col-md-6">
 					<q-input
+						dense
 						ref="email"
 						color="primary"
-						v-model="loginForm.name"
-						label="Full Name"
+						v-model="loginForm.purok"
+						label="Purok"
+					></q-input>
+				</div>
+				<div class="col-12 col-md-12">
+					<q-input
+						dense
+						ref="email"
+						color="primary"
+						v-model="loginForm.fname"
+						label="First Name"
 						lazy-rules
 						:rules="[
 							(val) => (val && val.length > 0) || 'Please type fullname',
@@ -16,21 +55,44 @@
 					></q-input>
 				</div>
 				<div class="col-12 col-md-12">
-					<q-select
-						v-model="facilityMain"
-						:options="facility"
-						option-value="id"
-						option-label="facility_name"
-						label="Facility"
+					<q-input
+						dense
+						ref="email"
+						color="primary"
+						v-model="loginForm.mname"
+						label="Middle Name"
 						lazy-rules
 						:rules="[
-							(val) =>
-								(val !== null && val !== '') || 'Please select a Facility',
+							(val) => (val && val.length > 0) || 'Please type fullname',
 						]"
-					/>
+					></q-input>
+				</div>
+				<div class="col-8 col-md-8">
+					<q-input
+						dense
+						ref="email"
+						color="primary"
+						v-model="loginForm.lname"
+						label="Last Name"
+						lazy-rules
+						:rules="[
+							(val) => (val && val.length > 0) || 'Please type fullname',
+						]"
+					></q-input>
+				</div>
+				<div class="col-4 col-md-4">
+					<q-input
+						dense
+						ref="email"
+						color="primary"
+						v-model="loginForm.ext"
+						label="Extension"
+						lazy-rules
+					></q-input>
 				</div>
 				<div class="col-12 col-md-12">
 					<q-input
+						dense
 						ref="email"
 						color="primary"
 						type="text"
@@ -42,6 +104,7 @@
 				</div>
 				<div class="col-6 col-md-6">
 					<q-input
+						dense
 						ref="password"
 						color="primary"
 						v-model="loginForm.password"
@@ -55,6 +118,7 @@
 				</div>
 				<div class="col-6 col-md-6">
 					<q-input
+						dense
 						ref="password2"
 						color="primary"
 						v-model="loginForm.password2"
@@ -71,8 +135,7 @@
 						@click="handleLogin"
 						:loading="loading"
 						style="width: 100%"
-						rounded
-						color="primary"
+						color="info"
 						label="Register"
 					/>
 				</div>
@@ -95,8 +158,12 @@ export default {
 				email: "",
 				password: "",
 				password2: null,
-				facility: null,
-				facilityName: null,
+				brgy_id: null,
+				fname: null,
+				mname: null,
+				lname: null,
+				ext: null,
+				purok: null,
 			},
 			facilityMain: [],
 			isPwd: true,
@@ -104,15 +171,14 @@ export default {
 			redirect: null,
 			loading: false,
 			valid: true,
+			barangay: [],
 		};
 	},
 	mounted() {
 		this.getFacility();
+		this.getBrgy();
 	},
 	methods: {
-		login() {
-			EventBus.$emit("login");
-		},
 		validate() {
 			this.$refs.email.validate();
 			this.$refs.password.validate();
@@ -130,6 +196,14 @@ export default {
 			const { data } = await new Resource("facility").list();
 			this.facility = data;
 		},
+		async getBrgy() {
+			await new Resource("getBrgy").list().then(({ data }) => {
+				this.barangay = data;
+			});
+		},
+		login() {
+			EventBus.$emit("login");
+		},
 		async handleLogin() {
 			try {
 				this.valid = true;
@@ -144,7 +218,6 @@ export default {
 							const { data } = await datax.store(this.loginForm);
 							// this.$message({ message: data.Message, type: data.status });
 							this.$q.notify(JSON.stringify(data.Message));
-							EventBus.$emit("login");
 							this.loading = false;
 						}
 					}
@@ -169,8 +242,16 @@ export default {
 	},
 };
 </script>
-<style lang="sass" scoped>
-.row > div
-  padding-left: 10px
-  padding-right: 10px
+
+<style scoped>
+#content .col {
+	float: left;
+}
+
+#footer {
+	clear: left;
+}
+.q-field--with-bottom {
+	padding-bottom: 15px;
+}
 </style>

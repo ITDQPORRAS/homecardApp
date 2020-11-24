@@ -14,6 +14,7 @@ const state = {
     userName: '',
     access: [],
     isAdmin: 0,
+    facilityName: ""
 };
 
 const mutations = {
@@ -47,6 +48,9 @@ const mutations = {
     SET_ADMIN: (state, data) => {
         state.isAdmin = data;
     },
+    SET_FACILITY: (state, permissions) => {
+        state.facilityName = permissions;
+    },
 };
 
 const actions = {
@@ -67,7 +71,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             login({ email: email.trim(), password: password })
                 .then(response => {
-                    LocalStorage.set("routes", response.data.access);
+
                     commit('SET_TOKEN', response.data.token);
                     commit('SET_ACCESS', response.data.access);
                     // console.log(response.data.token)
@@ -77,6 +81,32 @@ const actions = {
                 .catch(error => {
                     reject(error);
                 });
+        });
+    },
+    setTokenz({ commit }, data) {
+
+        return new Promise((resolve, reject) => {
+            commit('SET_TOKEN', data.access_token);
+            setToken(data.access_token);
+            resolve();
+        });
+    },
+    loginGoogle({ commit }, datax) {
+        const { email, password } = userInfo;
+        return new Promise((resolve, reject) => {
+
+            // login({ email: email.trim(), password: password })
+            //     .then(response => {
+
+            //         commit('SET_TOKEN', response.data.token);
+            //         commit('SET_ACCESS', response.data.access);
+            //         // console.log(response.data.token)
+            //         setToken(response.data.token);
+            //         resolve(response);
+            //     })
+            //     .catch(error => {
+            //         reject(error);
+            //     });
         });
     },
     access({ commit }) {
@@ -101,11 +131,22 @@ const actions = {
                     if (!data) {
                         reject('Verification failed, please Login again.');
                     }
-                    const { name, avatar, id, email, admin } = data;
+                    const { name, avatar, id, email, admin, access, facilityName } = data;
                     // roles must be a non-empty array
                     // if (!roles || roles.length <= 0) {
                     //   reject('getInfo: roles must be a non-null array!');
                     // }
+
+                    // roles must be a non-empty array
+                    // if (!roles || roles.length <= 0) {
+                    //   reject('getInfo: roles must be a non-null array!');
+                    // }
+                    // commit('SET_ROLES', roles);
+                    // commit('SET_PERMISSIONS', permissions);
+
+                    commit('SET_FACILITY', facilityName);
+
+                    LocalStorage.set("routes", access);
                     LocalStorage.set("info", data);
                     commit('SET_NAME', name);
                     commit('SET_AVATAR', avatar);

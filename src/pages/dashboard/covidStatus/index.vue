@@ -15,7 +15,7 @@
 											<q-avatar color="green" text-color="white">
 												<countTo
 													:startVal="0"
-													:endVal="caseStatus[0]['ACTIVE'] * 1"
+													:endVal="caseStatus[0]['ACTIVE'] * 1 || 0"
 													:duration="10000"
 												></countTo>
 											</q-avatar>
@@ -27,7 +27,7 @@
 											<q-avatar color="warning" text-color="white">
 												<countTo
 													:startVal="0"
-													:endVal="caseStatus[0]['RECOVERED'] * 1"
+													:endVal="caseStatus[0]['RECOVERED'] * 1 || 0"
 													:duration="10000"
 												></countTo>
 											</q-avatar>
@@ -39,7 +39,7 @@
 											<q-avatar color="negative" text-color="white">
 												<countTo
 													:startVal="0"
-													:endVal="caseStatus[0]['DECEASED'] * 1"
+													:endVal="caseStatus[0]['DECEASED'] * 1 || 0"
 													:duration="10000"
 												></countTo>
 											</q-avatar>
@@ -52,7 +52,7 @@
 											<q-avatar color="primary" text-color="white"
 												><countTo
 													:startVal="0"
-													:endVal="caseStatus[0]['TOTAL'] * 1"
+													:endVal="caseStatus[0]['TOTAL'] * 1 || 0"
 													:duration="10000"
 												></countTo
 											></q-avatar>
@@ -93,7 +93,7 @@
 											<q-badge color="info" text-color="black" floating>
 												<countTo
 													:startVal="0"
-													:endVal="gender[0]['MALE'] * 1"
+													:endVal="gender[0]['MALE'] * 1 || 0"
 													:duration="10000"
 												></countTo>
 											</q-badge>
@@ -110,7 +110,7 @@
 											<q-badge color="info" text-color="black" floating>
 												<countTo
 													:startVal="0"
-													:endVal="gender[0]['FEMALE'] * 1"
+													:endVal="gender[0]['FEMALE'] * 1 || 0"
 													:duration="10000"
 												></countTo>
 											</q-badge>
@@ -132,7 +132,7 @@
 											<q-badge color="red" floating>
 												<countTo
 													:startVal="0"
-													:endVal="age[0]['0-19'] * 1"
+													:endVal="age[0]['0-19'] * 1 || 0"
 													:duration="10000"
 												></countTo>
 											</q-badge>
@@ -150,7 +150,7 @@
 											<q-badge color="red" floating>
 												<countTo
 													:startVal="0"
-													:endVal="age[0]['20-19'] * 1"
+													:endVal="age[0]['20-19'] * 1 || 0"
 													:duration="10000"
 												></countTo>
 											</q-badge>
@@ -170,7 +170,7 @@
 											<q-badge color="red" floating>
 												<countTo
 													:startVal="0"
-													:endVal="age[0]['40-59'] * 1"
+													:endVal="age[0]['40-59'] * 1 || 0"
 													:duration="10000"
 												></countTo>
 											</q-badge>
@@ -188,7 +188,7 @@
 											<q-badge color="red" floating>
 												<countTo
 													:startVal="0"
-													:endVal="age[0]['60+'] * 1"
+													:endVal="age[0]['60+'] * 1 || 0"
 													:duration="10000"
 												></countTo>
 											</q-badge>
@@ -220,7 +220,7 @@
 													<q-item-label class="text-h6">
 														<countTo
 															:startVal="0"
-															:endVal="item.count * 1"
+															:endVal="item.count * 1 || 0"
 															:duration="10000"
 														></countTo>
 													</q-item-label>
@@ -255,13 +255,31 @@
 											</q-avatar>
 											SYMPTOMATIC
 										</q-chip>
-										<q-chip color="positive" text-color="white">
-											<countTo
-												:startVal="0"
-												:endVal="symptoms[0].SYMPTOMATIC * 1"
-												:duration="10000"
-											></countTo>
+										<q-chip>
+											<q-avatar color="green" text-color="white">
+												<countTo
+													:startVal="0"
+													:endVal="symptoms[0].SYMPTOMATIC * 1 || 0"
+													:duration="10000"
+												></countTo>
+											</q-avatar>
+											Total
 										</q-chip>
+
+										<q-chip v-for="(item, x) in asym" :key="x" dense>
+											<q-avatar :color="item.color" text-color="white">{{
+												item.count
+											}}</q-avatar>
+											{{ item.name }}
+										</q-chip>
+										<!-- <q-chip dense>
+											<q-avatar color="blue" text-color="white">50</q-avatar>
+											moderate
+										</q-chip>
+										<q-chip dense>
+											<q-avatar color="red" text-color="white">50</q-avatar>
+											severe
+										</q-chip> -->
 									</div>
 									<div class="col-6 text-center">
 										<q-chip square style="width: 100%">
@@ -273,7 +291,7 @@
 										<q-chip color="negative" text-color="white">
 											<countTo
 												:startVal="0"
-												:endVal="symptoms[0].ASYMPTOMATIC * 1"
+												:endVal="symptoms[0].ASYMPTOMATIC * 1 || 0"
 												:duration="10000"
 											></countTo>
 										</q-chip>
@@ -291,7 +309,7 @@
 										<q-chip color="positive" text-color="white">
 											<countTo
 												:startVal="0"
-												:endVal="comorbility[0].YES * 1"
+												:endVal="comorbility[0].YES * 1 || 0"
 												:duration="10000"
 											></countTo>
 										</q-chip>
@@ -306,7 +324,7 @@
 										<q-chip color="negative" text-color="white">
 											<countTo
 												:startVal="0"
-												:endVal="comorbility[0].NO * 1"
+												:endVal="comorbility[0].NO * 1 || 0"
 												:duration="10000"
 											></countTo>
 										</q-chip>
@@ -347,18 +365,29 @@ export default {
 	},
 	data() {
 		return {
-			chart1: this.$q.localStorage.getItem("chart1") || [],
-			chart2: this.$q.localStorage.getItem("chart2") || [],
-			chart3: this.$q.localStorage.getItem("chart3") || [],
-			chart4: this.$q.localStorage.getItem("chart4") || [],
-			perBarangaylist: this.$q.localStorage.getItem("chart5") || [],
-			occupation: this.$q.localStorage.getItem("occupation") || [],
-			symptoms: this.$q.localStorage.getItem("symptom") || [],
-			comorbility: this.$q.localStorage.getItem("comor") || [],
-			age: this.$q.localStorage.getItem("age") || [],
-			gender: this.$q.localStorage.getItem("gender") || [],
-			caseStatus: this.$q.localStorage.getItem("case_status") || [],
+			// chart1: null,
+			// chart2: null,
+			// chart3: null,
+			// chart4: null,
+			// perBarangaylist: null,
+			// occupation: null,
+			// symptoms: null,
+			// comorbility: null,
+			// age: null,
+			// gender: null,
+			// caseStatus: null,
+			chart1: this.$q.localStorage.getItem("chart1") || null,
+			chart2: this.$q.localStorage.getItem("chart2") || null,
+			chart3: this.$q.localStorage.getItem("chart3") || null,
+			chart4: this.$q.localStorage.getItem("chart4") || null,
+			perBarangaylist: this.$q.localStorage.getItem("chart5") || null,
+			occupation: this.$q.localStorage.getItem("occupation") || null,
+			symptoms: this.$q.localStorage.getItem("symptom") || null,
+			comorbility: this.$q.localStorage.getItem("comor") || null,
+			age: this.$q.localStorage.getItem("age") || null,
+			caseStatus: this.$q.localStorage.getItem("case_status") || null,
 			title: "As of " + date.formatDate(Date.now(), "MMMM DD, YYYY"),
+			asym: null,
 		};
 	},
 	mounted() {
@@ -375,21 +404,40 @@ export default {
 			this.case_by_age();
 			this.case_by_gender();
 			this.case_status();
+			this.ASYMPT_type();
 		},
 		async symptom() {
-			let chart2Local = this.$q.localStorage.getItem("symptom");
+			let symptom = this.$q.localStorage.getItem("symptom");
+			if (symptom) {
+				this.symptoms = symptom;
+			}
 			const { data } = await new Resource("Dashboard/symptom").list();
 			this.symptoms = data;
 			this.$q.localStorage.set("symptom", data);
 		},
 		async comor() {
-			let chart2Local = this.$q.localStorage.getItem("comor");
+			let comor = this.$q.localStorage.getItem("comor");
+			if (comor) {
+				this.comorbility = comor;
+			}
 			const { data } = await new Resource("Dashboard/comor").list();
 			this.comorbility = data;
 			this.$q.localStorage.set("comor", data);
 		},
+		async ASYMPT_type() {
+			let asymType = this.$q.localStorage.getItem("asymType");
+			if (asymType) {
+				this.asym = asymType;
+			}
+			const { data } = await new Resource("Dashboard/asymType").list();
+			this.asym = data;
+			this.$q.localStorage.set("asymType", data);
+		},
 		async case_by_occupation() {
-			let chart2Local = this.$q.localStorage.getItem("occupation");
+			let occupation = this.$q.localStorage.getItem("occupation");
+			if (occupation) {
+				this.occupation = occupation;
+			}
 			const { data } = await new Resource(
 				"Dashboard/case_by_occupation"
 			).list();
@@ -397,15 +445,20 @@ export default {
 			this.$q.localStorage.set("occupation", data);
 		},
 		async case_status() {
-			let chart4Local = this.$q.localStorage.getItem("case_status");
-			this.chart4 = chart4Local;
+			let case_status = this.$q.localStorage.getItem("case_status");
+			if (case_status) {
+				this.caseStatus = case_status;
+			}
 			const { data } = await new Resource("Dashboard/case_status").list();
 			this.caseStatus = data;
 			this.$q.localStorage.set("case_status", data);
 		},
 		async case_by_month() {
+			let chart1 = this.$q.localStorage.getItem("chart1");
+			if (chart1) {
+				this.chart1 = chart1;
+			}
 			const { data } = await new Resource("Dashboard/cases_by_month").list();
-
 			this.chart1 = {
 				series: [
 					{
@@ -446,7 +499,9 @@ export default {
 		},
 		async loadChart1() {
 			let chart1Local = this.$q.localStorage.getItem("chart1");
-			this.chart1 = chart1Local;
+			if (chart1Local) {
+				this.chart1 = chart1Local;
+			}
 			const { data } = await new Resource("Dashboard/deceased_by_age").list();
 			this.chart1 = {
 				series: [
@@ -518,7 +573,9 @@ export default {
 		},
 		async loadChart2() {
 			let chart2Local = this.$q.localStorage.getItem("chart2");
-			this.chart2 = chart2Local;
+			if (chart2Local) {
+				this.chart2 = chart2Local;
+			}
 			const { data } = await new Resource("Dashboard/current_status").list();
 			this.chart2 = {
 				series: data.map((item) => Object.values(item)[1]),
@@ -592,42 +649,35 @@ export default {
 			this.$q.localStorage.set("chart2", this.chart2);
 		},
 		async case_by_age() {
-			let chart = this.$q.localStorage.getItem("age") || [];
-			this.age = chart;
+			let chart = this.$q.localStorage.getItem("age");
+			if (chart) {
+				this.age = chart;
+			}
 			const { data } = await new Resource("Dashboard/case_by_age").list();
+			this.age = data;
 			this.$q.localStorage.set("age", data);
 		},
 		async case_by_gender() {
 			let chart4Local = this.$q.localStorage.getItem("gender");
-			this.chart4 = chart4Local;
+			if (chart4Local) {
+				this.chart4 = chart4Local;
+			}
 			const { data } = await new Resource("Dashboard/case_by_gender").list();
 			this.gender = data;
 			this.$q.localStorage.set("gender", data);
 		},
 		async perBarangay() {
 			let chart4Local = this.$q.localStorage.getItem("chart5");
-			this.perBarangaylist = chart4Local;
+			if (chart4Local) {
+				this.perBarangaylist = chart4Local;
+			}
 			const { data } = await new Resource("Dashboard/getPerBarangay").list();
-			// this.perBarangaylist = data;
-
 			this.perBarangaylist = {
 				series: [
 					{
 						name: "Count",
 						data: data.map((item) => Object.values(item)[1]),
 					},
-					// {
-					// 	name: "Recovered",
-					// 	data: data.map((item) => Object.values(item)[2]),
-					// },
-					// {
-					// 	name: "Deceased",
-					// 	data: data.map((item) => Object.values(item)[3]),
-					// },
-					// {
-					// 	name: "Active",
-					// 	data: data.map((item) => Object.values(item)[4]),
-					// },
 				],
 				chartOptions: {
 					chart: {
@@ -640,7 +690,6 @@ export default {
 					},
 					plotOptions: {
 						bar: {
-							// horizontal: true,
 							dataLabels: {
 								position: "top",
 							},
@@ -649,10 +698,7 @@ export default {
 					theme: {
 						palette: "palette2",
 					},
-					fill: {
-						// type: "gradient",
-						// colors: ["#F44336", "#E91E63", "#9C27B0"],
-					},
+					fill: {},
 					dataLabels: {
 						enabled: true,
 						style: {

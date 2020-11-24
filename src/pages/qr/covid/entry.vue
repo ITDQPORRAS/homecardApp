@@ -635,9 +635,4 @@ export default {
 	},
 };
 </script>
-<style lang="sass" scoped>
-.row > div
-  padding-left: 10px;
-  padding-right: 10px;
-</style>
 

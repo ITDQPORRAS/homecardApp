@@ -33,9 +33,10 @@ import { csrf } from "src/api/auth";
 import login from "./login";
 import register from "./register";
 import reset from "./reset";
+import profile from "./profile";
 import { colors } from "quasar";
 export default {
-	components: { login, register, reset },
+	components: { login, register, reset, profile },
 	data() {
 		return {
 			tab: "login",
@@ -49,7 +50,7 @@ export default {
 			isPwd: true,
 			redirect: null,
 			loading: false,
-			component: "login",
+			component: "profile",
 		};
 	},
 	mounted() {
@@ -66,6 +67,9 @@ export default {
 		});
 		EventBus.$on("login", (data) => {
 			this.component = "login";
+		});
+		EventBus.$on("profile", (data) => {
+			this.component = "profile";
 		});
 	},
 	watch: {

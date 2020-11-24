@@ -3,5 +3,15 @@
   "appName": "HomeCard",
   "bundledWebRuntime": false,
   "npmClient": "npm",
-  "webDir": "www"
+  "webDir": "www",
+  "plugins": {
+    "GoogleAuth": {
+      "scopes": [
+        "profile",
+        "email"
+      ],
+      "serverClientId": "990735916129-571uifuljrj6rm35jiltsqpk03kdfc1e.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
+    }
+  }
 }

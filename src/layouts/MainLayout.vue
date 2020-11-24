@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<skelProfile v-if="showLoading" />
-		<q-layout v-if="!showLoading" view="hHh Lpr lff">
+		<q-layout v-if="!showLoading" view="hHh lpR lFr">
 			<q-header elevated class="bg-white text-grey-8">
 				<div v-if="!fixedHeader" class="row no-wrap">
 					<q-toolbar class="col-12 bg-primary text-white">
@@ -134,6 +134,7 @@
 				</q-toolbar>
 			</q-header>
 			<q-drawer v-model="leftDrawerOpen" show-if-above bordered elevated>
+				<!-- <q-pull-to-refresh @refresh="refresh"> -->
 				<div class="absolute-top" style="height: 130px">
 					<div class="row">
 						<div class="col-10 absolute-bottom bg-transparent q-pa-sm">
@@ -205,8 +206,30 @@
 						Ⓒ 2020
 					</q-banner>
 				</div>
+				<!-- </q-pull-to-refresh> -->
 			</q-drawer>
 
+			<q-footer dense elevated reveal bordered class="bg-white text-primary">
+				<div class="full-width">
+					<q-tabs
+						no-caps
+						active-color="primary"
+						indicator-color="primary"
+						class="text-grey text-center full-width"
+						v-model="tab"
+					>
+						<q-tab dense icon="home" name="home" label="Logs" />
+						<q-tab dense icon="mail" name="message" label="Message" />
+						<q-tab
+							dense
+							icon="account_circle"
+							name="settings"
+							label="Profile"
+							@click="onProfile"
+						/>
+					</q-tabs>
+				</div>
+			</q-footer>
 			<q-page-container>
 				<transition
 					appear
@@ -262,7 +285,7 @@ export default {
 			leftDrawerOpen: !this.$q.platform.is.mobile,
 			routess: [],
 			ModuleName: [],
-			ModuleGroup: [],
+			ModuleGroup: this.$q.localStorage.getItem("ModuleGroup") || [],
 			userlist: [],
 			title: this.$q.localStorage.getItem("ModuleGroupTitle") || "Modules",
 			form: {
@@ -279,6 +302,7 @@ export default {
 			newRoute: [],
 			infox: this.$q.localStorage.getItem("info") || [],
 			Dark: false,
+			Menux: [],
 		};
 	},
 	sockets: {
@@ -293,34 +317,36 @@ export default {
 		},
 	},
 	async mounted() {
-		// Dark.toggle();
+		// alert("mounted");
 		this.showLoading = true;
 		this.$router.addRoutes(asyncRoutes);
 		colors.setBrand(
 			"primary",
 			this.$q.localStorage.getItem("themes") || "#31CCEC"
 		);
-		this.islogin = this.userId;
-		this.loadRoutes();
-		this.ModuleGroup = this.$q.localStorage.getItem("ModuleGroup") || [];
-		await this.chechAuth()
-			.then(() => {
-				this.showLoading = false;
-			})
-			.catch(() => {
-				this.showLoading = false;
-			});
-		// await store.dispatch("global/getData");
-		// await this.$store.dispatch("user/getInfo");
-		// this.showLoaded();
-		this.showMenu();
 
-		// this.update_route();
+		this.loadRoutes();
+		// this.ModuleGroup = this.$q.localStorage.getItem("ModuleGroup") || [];
 	},
 	methods: {
+		async refresh(done) {
+			this.loadRoutes();
+			this.ModuleGroup = this.$q.localStorage.getItem("ModuleGroup") || [];
+			this.showMenu();
+			await this.chechAuth()
+				.then(() => {
+					this.islogin = this.userId;
+					this.showLoading = false;
+				})
+				.catch(() => {
+					this.showLoading = false;
+				});
+
+			done();
+		},
 		loadRoutes() {
 			this.newRoute = JSON.parse(JSON.stringify(asyncRoutes));
-			console.log(this.newRoute);
+			// console.log(this.newRoute);
 			this.newRoute.forEach((element) => {
 				element.children.forEach((el) => {
 					console.log(el.children.length);
@@ -347,15 +373,19 @@ export default {
 			});
 		},
 		async chechAuth() {
-			const hasToken = await this.$store.dispatch("user/access");
-			if (!hasToken) {
-				this.$router.push("/login");
-			} else {
-				try {
-					this.$store.dispatch("user/getInfo");
-					this.showLoaded();
-				} catch (error) {}
-			}
+			await this.$store
+				.dispatch("user/access")
+				.then(async (res) => {
+					if (!hasToken) {
+						this.$router.push("/login");
+					} else {
+						try {
+							await this.$store.dispatch("user/getInfo");
+							this.showLoaded();
+						} catch (error) {}
+					}
+				})
+				.catch(() => {});
 		},
 		async setLogout(email) {
 			await new Resource("userMonitoring/logout").get(email);
@@ -366,12 +396,14 @@ export default {
 		},
 		async showLoaded() {
 			await this.$store.dispatch("global/getData");
-			store.dispatch("global/getPopulation");
+
 			// store.dispatch("global/showAppointed");
 			store.dispatch("global/Departments");
 			this.setProfile();
 		},
 		async logout() {
+			this.$hello("google").logout();
+			this.$hello("facebook").logout();
 			this.$q.loading.show();
 			this.$store.dispatch("user/logout");
 			this.$router.push(`/login`);
@@ -383,6 +415,9 @@ export default {
 			this.$socket.client.emit("out", this.userName);
 		},
 		showMenu() {
+			this.Menux = this.newRoute.find(
+				(x) => x.meta.title === "Home Card"
+			).children;
 			this.ModuleGroup = this.newRoute.find(
 				(x) => x.meta.title === "Home Card"
 			);
@@ -448,8 +483,8 @@ export default {
 			await datax.store(par).then(() => {});
 		},
 		checkAccess(path) {
-			console.log(this.isAdmin);
-			if (this.isAdmin == 1) {
+			// console.log(this.isAdmin);
+			if (this.isAdmin || 0 == 1) {
 				return true;
 			}
 			let data = this.initiate.find((el) => el["file_route"] === path);
@@ -461,12 +496,24 @@ export default {
 				return false;
 			}
 		},
+		onProfile() {
+			this.$router.push("/profile");
+		},
 	},
 	watch: {
 		islogin: {
 			async handler(newVal) {
+				// alert(newVal);
 				// this.loadRoutes();
 				if (!newVal) {
+					await store.dispatch("user/getInfo");
+					this.showLoaded();
+					this.form.name = name;
+					this.form.email = name;
+					this.$socket.client.emit("join", { email: this.userName });
+					this.loadRoutes();
+				}
+				if (newVal > 0) {
 					await store.dispatch("user/getInfo");
 					this.showLoaded();
 					this.form.name = name;
@@ -484,8 +531,19 @@ export default {
 			Dark.set(val);
 		},
 	},
-	created() {
-		this.loadRoutes();
+	async created() {
+		await this.chechAuth()
+			.then(() => {
+				this.loadRoutes();
+				this.showMenu();
+				this.islogin = this.userId;
+				this.showLoading = false;
+			})
+			.catch(() => {
+				this.showLoading = false;
+			});
+
+		// alert("creaded");
 		window.addEventListener(
 			"beforeunload",
 			async () => {
@@ -508,16 +566,17 @@ export default {
 		]),
 
 		initiate() {
-			return this.$q.localStorage.getItem("routes").filter((x) => {
+			let datax = this.$q.localStorage.getItem("routes") || [];
+			return datax.filter((x) => {
 				return x.access === "initiate";
 			});
 		},
-		Menux() {
-			return (
-				this.$q.localStorage.getItem("ModuleGroup").children ||
-				this.ModuleGroup.children
-			);
-		},
+		// Menux() {
+		// 	return (
+		// 		this.$q.localStorage.getItem("ModuleGroup").children ||
+		// 		this.ModuleGroup.children
+		// 	);
+		// },
 		ActiveList() {
 			return this.userlist.filter((x) => {
 				return x.isLogin === "1";

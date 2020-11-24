@@ -81,6 +81,17 @@
 										clickable
 										v-ripple
 										v-close-popup
+										@click="ContactTracing(props.row)"
+									>
+										<q-item-section avatar>
+											<q-icon color="secondary" name="scatter_plot" />
+										</q-item-section>
+										<q-item-section>Contact Tracing</q-item-section>
+									</q-item>
+									<q-item
+										clickable
+										v-ripple
+										v-close-popup
 										@click="statusUpdate(props.row)"
 									>
 										<q-item-section avatar>
@@ -106,7 +117,9 @@
 		>
 			<update ref="update" :form="selected" />
 		</dlg>
-
+		<dlg v-model="dlgTracing" :title="title" :showCommand="false">
+			<tracing />
+		</dlg>
 		<xmenus @add="goHome" @filter="dlgfilter = true">
 			<template v-slot>
 				<q-fab-action
@@ -130,6 +143,7 @@ import filterx from "#/filter";
 import dlg from "#/dlg";
 import info from "#/Information";
 import update from "./update";
+import tracing from "./tracing";
 import { exportFile } from "quasar";
 function wrapCsvValue(val, formatFn) {
 	let formatted = formatFn !== void 0 ? formatFn(val) : val;
@@ -140,12 +154,13 @@ function wrapCsvValue(val, formatFn) {
 }
 export default {
 	name: "list",
-	components: { xmenus, filterx, dlg, info, update },
+	components: { xmenus, filterx, dlg, info, update, tracing },
 	props: {
 		datax: Object,
 	},
 	data() {
 		return {
+			dlgTracing: false,
 			selected: [],
 			title: "",
 			dlgStatus: false,
@@ -156,6 +171,13 @@ export default {
 			dlgDetails: false,
 			loading: false,
 			headers: [
+				{
+					name: "actions",
+					label: "ACTIONS",
+					field: "actions",
+					align: "center",
+					width: "80px",
+				},
 				{
 					name: "refNo",
 					label: "PATIENT CODE NO.",
@@ -274,13 +296,6 @@ export default {
 					field: "date",
 					align: "left",
 				},
-				{
-					name: "actions",
-					label: "Action",
-					field: "actions",
-					align: "right",
-					width: "100px",
-				},
 			],
 			list: [],
 			dtls: [],
@@ -365,6 +380,10 @@ export default {
 			} catch (error) {
 				this.loading = false;
 			}
+		},
+		async ContactTracing(item) {
+			this.title = item.refNo;
+			this.dlgTracing = true;
 		},
 		async exportTableLeader() {
 			const content = [this.headers.map((col) => wrapCsvValue(col.label))]
