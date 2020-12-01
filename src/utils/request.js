@@ -41,13 +41,16 @@ axiosInstance.interceptors.response.use(
         }
         if (JSON.stringify(message).includes("401")) {
             store.dispatch('user/logout');
+
+        } else {
+            Notify.create({
+                message: message,
+                color: 'warning',
+                icon: 'report_problem',
+                position: 'top'
+            })
         }
-        // Notify.create({
-        //     message: message,
-        //     color: 'warning',
-        //     icon: 'report_problem',
-        //     position: 'top'
-        // })
+
         return Promise.reject(error);
     }
 );

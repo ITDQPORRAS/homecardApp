@@ -120,6 +120,20 @@ const Mod_QR = {
                     meta: { title: 'Facility', icon: 'business', requiresAuth: true, access: ['initiate', 'save', 'update', 'view'] },
                 },
                 {
+                    path: '/OnlineApprovalRegister',
+                    component: () =>
+                        import ('pages/Admin/OnlineApprovalRegister'),
+                    name: 'OnlineApprovalRegister',
+                    meta: { title: 'Register Approval', icon: 'group_add', requiresAuth: true, access: ['initiate'] },
+                },
+                {
+                    path: '/OnlineApprovalMember',
+                    component: () =>
+                        import ('pages/Admin/OnlineApprovalMember'),
+                    name: 'OnlineApprovalMember',
+                    meta: { title: 'Member Approval', icon: 'group_add', requiresAuth: true, access: ['initiate'] },
+                },
+                {
                     path: '/UserMonitoring',
                     component: () =>
                         import ('pages/Admin/User'),

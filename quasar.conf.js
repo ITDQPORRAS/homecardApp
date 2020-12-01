@@ -29,7 +29,7 @@ module.exports = function( /* ctx */ ) {
             'moment',
             'qriously',
             'numeral',
-            // 'socket',
+            'socket',
             'components',
             'hello',
             'vuesocialite',

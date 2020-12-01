@@ -6,7 +6,7 @@
 					<q-img
 						src="icon/banner.jpg"
 						spinner-color="white"
-						style="height: 140px; max-width: 150px"
+						style="height: 150px; max-width: 150px"
 					></q-img>
 				</div>
 				<div class="col-12 col-md-12 q-pt-md">
@@ -143,7 +143,7 @@
 					>
 					</q-btn>
 				</div> -->
-				<div class="col-12 col-md-12 q-pt-sm">
+				<!-- <div class="col-12 col-md-12 q-pt-sm">
 					<q-btn
 						@click="auth('google')"
 						color="negative"
@@ -154,8 +154,7 @@
 						size="md"
 					>
 					</q-btn>
-					<!-- <btngoogle /> -->
-				</div>
+				</div> -->
 				<div class="col-12 col-md-12 q-pt-sm">
 					<div class="text-center">
 						No account yet?
@@ -320,8 +319,10 @@ export default {
 						this.$q.loading.hide();
 						this.loading = false;
 					})
-					.catch((er) => {
-						this.$q.notify(er);
+					.catch((error) => {
+						// console.log(error);
+						// alert("asd");
+						// this.$q.notify(error);
 						// alert(er.error);
 						this.$q.loading.hide();
 					});

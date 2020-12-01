@@ -2,8 +2,8 @@
 	<q-dialog
 		v-model="show"
 		:maximized="full === true ? true : $q.platform.is.mobile"
-		:full-height="$q.platform.is.mobile"
-		:full-width="$q.platform.is.mobile"
+		:full-height="full === true ? true : $q.platform.is.mobile"
+		:full-width="full === true ? true : $q.platform.is.mobile"
 		persistent
 		transition-show="slide-left"
 		transition-hide="slide-right"

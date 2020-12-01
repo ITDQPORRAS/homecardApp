@@ -1,5 +1,5 @@
 import { login, logout, getInfo, access, insertform } from 'src/api/auth';
-import { getToken, setToken, removeToken } from 'src/utils/auth';
+import { getToken, setToken, removeToken, setInfo } from 'src/utils/auth';
 import router from 'src/router';
 import store from 'src/store';
 import { LocalStorage } from 'quasar';
@@ -147,7 +147,7 @@ const actions = {
                     commit('SET_FACILITY', facilityName);
 
                     LocalStorage.set("routes", access);
-                    LocalStorage.set("info", data);
+                    setInfo(data);
                     commit('SET_NAME', name);
                     commit('SET_AVATAR', avatar);
                     // commit('SET_INTRODUCTION', introduction);

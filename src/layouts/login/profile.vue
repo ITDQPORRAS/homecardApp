@@ -11,7 +11,7 @@
 						<q-card flat class="column items-center">
 							<!-- <div id="content"> -->
 							<div class="row">
-								<div class="col-5">
+								<div class="col-5 text-center">
 									<img
 										src="icon/banner.jpg"
 										alt
@@ -47,21 +47,36 @@
 						</div>
 						<div class="col-6">
 							<div class="text-h5 text-center">
-								<qriously :value="code" :size="160" />
-								<div class="text-body2 text-center">POB00112023312</div>
+								<qriously :value="selected.code" :size="160" />
+								<div class="text-body2 text-center">{{ selected.code }}</div>
 							</div>
 						</div>
 					</div>
 				</div>
 				<div class="text-h5 text-bold text-center">
-					<u>Richard Abella Porras</u>
+					<u>{{ selected.name }}</u>
+					<q-popup-proxy transition-show="flip-up" transition-hide="flip-down">
+						<q-banner class="bg-primary text-white">
+							<q-list style="min-width: 100px">
+								<q-item
+									v-for="(item, x) in datax"
+									:key="x"
+									clickable
+									v-close-popup
+									@click="selectedPerson(item)"
+								>
+									<q-item-section>{{ item.fullname }}</q-item-section>
+								</q-item>
+							</q-list>
+						</q-banner>
+					</q-popup-proxy>
 				</div>
 				<div class="text-h5 text-bold text-center q-pt-lg">
-					Maria Luzviminda
+					{{ selected.captain }}
 					<div class="text-subtitle2 text-center">Punong barangay</div>
 				</div>
 				<div class="text-h5 text-bold text-center q-pt-lg">
-					Peter June Simon
+					{{ selected.mayor }}
 					<div class="text-subtitle1 text-center">City/Municipal Mayor</div>
 				</div>
 			</div>
@@ -73,17 +88,39 @@ import { csrf } from "src/api/auth";
 import EventBus from "./events";
 import Resource from "@/api/resource";
 import btngoogle from "#/q-google";
+import { getInfo, getMember, setSelected, getSelected } from "src/utils/auth";
 // import GoogleLogin from "vue-google-login";
 export default {
 	data() {
 		return {
 			code: null,
+			datax: null,
+			selected: {
+				name: "Click Me",
+				captain: null,
+				mayor: null,
+				code: null,
+			},
 		};
 	},
 	methods: {
 		onLogin() {
 			EventBus.$emit("login");
 		},
+		selectedPerson(item) {
+			this.selected.name = item.fullname;
+			this.selected.captain = item.brgy_captain;
+			this.selected.mayor = item.citymunMayor;
+			this.selected.code = item.client_guid;
+			setSelected(this.selected);
+		},
+	},
+	mounted() {
+		this.datax = getMember();
+		console.log(getMember());
+		if (getSelected()) {
+			this.selected = getSelected();
+		}
 	},
 };
 </script>

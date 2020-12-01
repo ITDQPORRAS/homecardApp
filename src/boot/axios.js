@@ -14,12 +14,13 @@ import axios from 'axios'
 // a named export, as we could just `import axios from 'axios'`
 const axiosInstance = axios.create({
 
-    baseURL: 'http://localhost:1111/api/',
-    // baseURL: 'http://18.221.253.87/HomeCardBackend/public/api',
+    // baseURL: 'http://localhost:1111/api/',
+    baseURL: 'http://18.221.253.87/HomeCardBackend/public/api',
     // baseURL: 'http://localhost:8000/quasar/backends_qr/public/api/',
     // baseURL: 'http://3.20.55.147/api/',
     // baseURL: 'http://localhost:8000/QuasarPassport/back_passport/public/api/',
     withCredentials: true,
+    timeout: 40000,
     headers: {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',

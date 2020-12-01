@@ -5,21 +5,19 @@
 				<q-tabs
 					v-model="tab"
 					dense
-					active-color="primary"
-					indicator-color="primary"
 					align="justify"
 					narrow-indicator
 					inline-label
+					class="bg-primary text-white shadow-2"
 				>
-					<q-tab name="barangay" label="Add Member" />
-					<q-tab name="list" label="Members" />
+					<q-tab name="barangay" icon="add" label="Add Member" />
+					<q-tab name="list" icon="groups" label="Members" />
 				</q-tabs>
 				<q-separator />
 				<q-tab-panels v-model="tab" animated>
 					<q-tab-panel name="barangay">
-						<entry />
+						<entry @loaded="loadMember()" />
 					</q-tab-panel>
-
 					<q-tab-panel name="list">
 						<q-table
 							class="my-sticky-header-table"
@@ -28,39 +26,183 @@
 							bordered
 							:loading="loading"
 							:columns="headersList"
-							:data="listsName"
+							:data="listMember"
 							dense
 							:filter="searchName"
 							:rows-per-page-options="[20, 40]"
 							row-key="idx"
-							@selection="onSelection"
-							selection="multiple"
-							:selected.sync="selected"
 						>
 							<template v-slot:top-left>
-								<div class="text-subtitle2">{{ BarangayName }}</div>
+								<div class="text-center">
+									<q-input
+										dense
+										outlined
+										v-model="datax.rep_address"
+										:readonly="!read"
+										label="Purok"
+									>
+										<template v-slot:append>
+											<q-icon
+												name="loop"
+												@click="read = !read"
+												class="cursor-pointer"
+											/>
+										</template>
+									</q-input>
+								</div>
 							</template>
-							<template v-slot:body-cell-actions="props">
-								<q-td :props="props">
-									<div class="col-auto">
-										<q-btn color="grey-7" size="xs" round flat icon="more_vert">
-											<q-menu cover auto-close>
-												<q-list>
-													<q-item clickable>
-														<q-item-section @click="printCard(props.row)"
-															>Print Card</q-item-section
+							<template v-slot:body="props">
+								<q-tr :props="props">
+									<q-td key="lastName" :props="props">
+										{{ props.row.lastName }}
+										<q-popup-edit
+											v-model="props.row.lastName"
+											title="last Name"
+											buttons
+										>
+											<q-input
+												v-model="props.row.lastName"
+												dense
+												autofocus
+												counter
+												buttons
+											/>
+										</q-popup-edit>
+									</q-td>
+
+									<q-td key="firstName" :props="props">
+										{{ props.row.firstName }}
+										<q-popup-edit
+											v-model="props.row.firstName"
+											title="First Name"
+											buttons
+										>
+											<q-input v-model="props.row.firstName" dense autofocus />
+										</q-popup-edit>
+									</q-td>
+									<q-td key="middleName" :props="props">
+										{{ props.row.middleName }}
+										<q-popup-edit
+											v-model="props.row.middleName"
+											title="Middle Name"
+											buttons
+										>
+											<q-input v-model="props.row.middleName" dense autofocus />
+										</q-popup-edit>
+									</q-td>
+
+									<q-td key="suffix" :props="props">
+										{{ props.row.suffix }}
+										<q-popup-edit
+											v-model="props.row.suffix"
+											title="Suffix"
+											buttons
+										>
+											<q-input
+												v-model="props.row.suffix"
+												dense
+												autofocus
+												counter
+												buttons
+											/>
+										</q-popup-edit>
+									</q-td>
+									<q-td key="birthdate" :props="props">
+										{{ props.row.birthdate }}
+										<q-popup-edit
+											v-model="props.row.birthdate"
+											title="Birthdate"
+											buttons
+										>
+											<q-input
+												v-model="props.row.birthdate"
+												mask="date"
+												dense
+												autofocus
+												counter
+												buttons
+											>
+												<template v-slot:hint>YYYY/MM/DD</template>
+												<template v-slot:append>
+													<q-icon name="event" class="cursor-pointer">
+														<q-popup-proxy
+															ref="qDateProxy4"
+															transition-show="scale"
+															transition-hide="scale"
 														>
-													</q-item>
-													<q-item clickable>
-														<q-item-section @click="viewmember(props.row)"
-															>View Member</q-item-section
-														>
-													</q-item>
-												</q-list>
-											</q-menu>
-										</q-btn>
-									</div>
-								</q-td>
+															<q-date
+																v-model="props.row.birthdate"
+																@input="() => $refs.qDateProxy4.hide()"
+															/>
+														</q-popup-proxy>
+													</q-icon>
+												</template>
+											</q-input>
+										</q-popup-edit>
+									</q-td>
+									<q-td key="gender" :props="props">
+										{{ props.row.gender }}
+										<q-popup-edit
+											v-model="props.row.gender"
+											title="Gender"
+											buttons
+										>
+											<q-select
+												ref="relation"
+												v-model="props.row.gender"
+												:options="genderx"
+												option-value="id"
+												option-label="description"
+												dense
+												autofocus
+											/>
+										</q-popup-edit>
+									</q-td>
+									<q-td key="contact_number" :props="props">
+										{{ props.row.contact_number }}
+										<q-popup-edit v-model="props.row.contact_number" buttons>
+											<q-input
+												v-model="props.row.contact_number"
+												dense
+												autofocus
+												counter
+												title="Contact #"
+												buttons
+											/>
+										</q-popup-edit>
+									</q-td>
+									<q-td key="member_type" :props="props">
+										{{ props.row.member_type }}
+										<q-popup-edit
+											v-model="props.row.member_type"
+											title="Relation"
+											buttons
+										>
+											<q-select
+												ref="relation"
+												v-model="props.row.member_type"
+												:options="relation"
+												option-value="id"
+												option-label="description"
+												dense
+												autofocus
+											/>
+										</q-popup-edit>
+									</q-td>
+									<q-td key="rep_address" :props="props">{{
+										props.row.rep_address
+									}}</q-td>
+									<q-td key="remove" :props="props">
+										<q-btn
+											color="grey-7"
+											@click="remove(props.row)"
+											size="xs"
+											round
+											flat
+											icon="close"
+										></q-btn>
+									</q-td>
+								</q-tr>
 							</template>
 							<template v-slot:top-right>
 								<q-input
@@ -77,43 +219,18 @@
 								</q-input>
 							</template>
 						</q-table>
-						<div class="q-mt-md">Selected: {{ JSON.stringify(selected) }}</div>
-						<q-page-sticky position="bottom-left" :offset="[18, 18]">
+						<q-page-sticky position="bottom-right" :offset="[18, 18]">
 							<q-btn
-								v-show="showIndi"
+								v-show="showSave"
 								:loading="loading"
-								push
+								size="lg"
 								round
-								icon="print"
-								@click="printSelectedMultiple"
+								icon="save"
+								@click="updateData"
 								class="text-white"
 								color="teal"
-							>
-								<q-tooltip>Print Selected</q-tooltip>
-							</q-btn>
+							></q-btn>
 						</q-page-sticky>
-						<xmenu
-							:loading="loading"
-							showfilter
-							v-show="!showIndi"
-							:showAdd="true"
-							showPrint
-							@print="print"
-							@filter="dlgfilter = true"
-							@add="addNew"
-						>
-							<template v-slot>
-								<q-fab-action
-									label-class="bg-grey-3 text-grey-8"
-									external-label
-									color="orange"
-									icon="history_edu"
-									label="Export"
-									label-position="top"
-									@click="exportTableLeader"
-								/>
-							</template>
-						</xmenu>
 					</q-tab-panel>
 				</q-tab-panels>
 			</q-card>
@@ -153,11 +270,12 @@ import entry from "./entry";
 import { exportFile } from "quasar";
 import Resource from "src/api/resource";
 import { mapGetters } from "vuex";
-import xmenu from "#/menu";
+import { getInfo, setMember } from "src/utils/auth";
 import filterx from "#/filter";
 import dlg from "#/dlg";
 import member from "./member";
 import store from "src/store";
+import { Cookies } from "quasar";
 function wrapCsvValue(val, formatFn) {
 	let formatted = formatFn !== void 0 ? formatFn(val) : val;
 	formatted =
@@ -167,7 +285,6 @@ function wrapCsvValue(val, formatFn) {
 }
 export default {
 	components: {
-		xmenu,
 		filterx,
 		dlg,
 		member,
@@ -175,6 +292,8 @@ export default {
 	},
 	data() {
 		return {
+			read: false,
+			showSave: false,
 			form: {
 				lastName: "",
 				firstName: "",
@@ -189,7 +308,9 @@ export default {
 			},
 			reference: [],
 			MemberTitle: null,
-			datax: [],
+			datax: {
+				rep_address: null,
+			},
 			purok: [],
 			purokName: { id: "%", purok: "All" },
 			dlgfilter: false,
@@ -205,56 +326,21 @@ export default {
 			loading: false,
 			BarangayName: null,
 			listsName: [],
-			headers: [
-				{ name: "name", label: "Barangay", field: "brgy_name", align: "left" },
-				{
-					name: "no",
-					label: "No of Household",
-					field: "housecount",
-					align: "right",
-					format: (val, row) =>
-						`${val
-							.toFixed(0)
-							.toString()
-							.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`,
-				},
-				{
-					name: "withmembers",
-					label: "w/ Members",
-					field: "withmembers",
-					align: "right",
-					format: (val, row) =>
-						`${parseFloat(val)
-							.toFixed(0)
-							.toString()
-							.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`,
-				},
-				{
-					name: "perentage",
-					label: "Percentage",
-					field: "perentage",
-					align: "center",
-					format: (val, row) =>
-						`${parseFloat(val)
-							.toFixed(2)
-							.toString()
-							.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}%`,
-				},
-			],
+			listMember: [],
+			genderx: ["Female", "Male"],
 			headersList: [
-				{
-					name: "HN",
-					label: "HN",
-					field: "client_guid",
-					align: "left",
-				},
+				// {
+				// 	name: "home",
+				// 	label: "Default Card",
+				// 	field: "home",
+				// 	align: "left",
+				// },
 				{
 					name: "lastName",
 					label: "Last Name",
 					field: "lastName",
 					align: "left",
 				},
-
 				{
 					name: "firstName",
 					label: "First Name",
@@ -267,30 +353,149 @@ export default {
 					field: "middleName",
 					align: "left",
 				},
+
 				{
 					name: "suffix",
 					label: "Suffix",
 					field: "suffix",
 					align: "left",
 				},
-
 				{
-					name: "purok",
-					label: "Purok Name",
-					field: "rep_address",
+					name: "birthdate",
+					label: "Birth Date",
+					field: "birthdate",
+					align: "left",
+					format: (val, row) => `${date.formatDate(val, "MM/DD/YYYY")}`,
+				},
+				{
+					name: "gender",
+					label: "Gender",
+					field: "gender",
 					align: "left",
 				},
 				{
-					name: "members",
-					label: "Members",
-					field: "members",
-					align: "center",
+					name: "contact_number",
+					label: "Contact #",
+					field: "contact_number",
+					align: "left",
 				},
-				{ name: "actions", label: "Action", field: "action", align: "center" },
+				{
+					name: "member_type",
+					label: "Relation",
+					field: "member_type",
+					align: "left",
+				},
+				// {
+				// 	name: "rep_address",
+				// 	label: "Purok",
+				// 	field: "rep_address",
+				// 	align: "left",
+				// },
+				{
+					name: "remove",
+					label: "Remove",
+					field: "remove",
+					align: "left",
+				},
 			],
+			relation: [],
 		};
 	},
 	methods: {
+		validations() {
+			for (let index = 0; index < this.listMember.length; index++) {
+				// const element = this.listMember[index].lastName;
+				if (!this.listMember[index].lastName) {
+					this.$q.notify({
+						type: "negative",
+						message: `Please input Last Name @row ` + (index + 1),
+					});
+					this.valid = false;
+					return (this.valid = false);
+				}
+				if (!this.listMember[index].firstName) {
+					this.$q.notify({
+						type: "negative",
+						message: `Please input first Name @row ` + (index + 1),
+					});
+					this.valid = false;
+					return (this.valid = false);
+				}
+			}
+			return (this.valid = true);
+		},
+		async updateData() {
+			try {
+				this.validations();
+
+				if (this.valid) {
+					this.loading = true;
+					const datax = new Resource("Reader/UpdateMember");
+					const { data } = await datax.store({
+						data: this.listMember,
+						main: this.datax,
+					});
+
+					this.$q.notify(JSON.stringify(data.Message));
+					this.loading = false;
+					this.loadMember(this.form.client_guid);
+					this.$emit("loaded");
+				}
+			} catch (error) {
+				this.loading = false;
+			}
+		},
+		compare(arr1, arr2) {
+			if (JSON.stringify(arr1) !== JSON.stringify(arr2)) {
+				this.showSave = true;
+			} else {
+				this.showSave = false;
+			}
+		},
+		async loadRelation() {
+			const { data } = await new Resource("Reader/GetRelationship").list();
+			this.relation = data.map((item) => Object.values(item)[1]);
+		},
+		async loadMember() {
+			this.tab = "list";
+			this.loading = true;
+			const datax = new Resource("Reader/getMember");
+			const { data } = await datax.get(getInfo()["details"][0]["client_guid"]);
+			const d = data;
+
+			this.listMember = d;
+			Cookies.set("datax", d);
+			this.listMemberOld = Cookies.get("datax");
+			this.loading = false;
+			new Resource("Reader/getMemberList")
+				.get(getInfo()["details"][0]["client_guid"])
+				.then(({ data }) => {
+					setMember(data);
+				});
+		},
+		async remove(item) {
+			if (item.member_type !== "Puno ng Pamilya") {
+				this.$q
+					.dialog({
+						title: "Confirm",
+						message: "Would you like to cancel this record?",
+						cancel: true,
+						persistent: true,
+					})
+					.onOk(() => {
+						this.removing(item.id);
+					});
+			} else {
+				this.$q.notify("not allowed!");
+			}
+		},
+		async removing(id) {
+			this.loading = true;
+			const { data } = await new Resource("Reader/removeMember").get(id);
+			this.$q.notify(JSON.stringify(data.Message));
+			this.loadMember();
+			this.loading = false;
+		},
 		exportTable() {
 			const content = [this.headers.map((col) => wrapCsvValue(col.label))]
 				.concat(
@@ -536,9 +741,38 @@ export default {
 			// }
 		},
 	},
-	mounted() {},
+	mounted() {
+		// console.log(getInfo());
+		this.datax.rep_address = getInfo()["details"][0]["rep_address"];
+		this.loadMember();
+		this.loadRelation();
+	},
 	computed: {
 		...mapGetters(["barangay"]),
+	},
+	watch: {
+		"datax.rep_address": function name() {
+			this.showSave = true;
+		},
+		gender: function (val) {
+			this.form.gender = val;
+		},
+		"form.birthdate": function (val) {
+			this.form.birthdate = this.$moment(val.toLocaleString()).format(
+				"YYYY-MM-DD"
+			);
+		},
+		"form.birthdate": function (val) {
+			this.form.birthdate = this.$moment(val.toLocaleString()).format(
+				"YYYY-MM-DD"
+			);
+		},
+		listMember: {
+			deep: true,
+			handler(newData, oldData) {
+				this.compare(newData, this.listMemberOld);
+			},
+		},
 	},
 };
 </script>
