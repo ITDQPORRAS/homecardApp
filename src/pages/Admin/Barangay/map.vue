@@ -34,25 +34,13 @@
 								</q-item-section>
 								<q-item-section top side>
 									<div class="text-grey-8 q-gutter-xs">
-										<q-btn size="8px" flat dense round icon="more_vert">
-											<q-menu
-												dense
-												transition-show="scale"
-												transition-hide="scale"
-											>
-												<q-list dense style="min-width: 100px">
-													<q-item
-														clickable
-														v-close-popup
-														@click="onSelected(item)"
-													>
+										<q-btn size="12px" flat dense round icon="more_vert">
+											<q-menu dense>
+												<q-list dense style="min-width: 300px">
+													<q-item clickable v-close-popup>
 														<q-item-section>Pin Location</q-item-section>
 													</q-item>
-													<q-item
-														clickable
-														v-close-popup
-														@click="onSelectedFacility(item)"
-													>
+													<q-item clickable v-close-popup>
 														<q-item-section>Pin Facility</q-item-section>
 													</q-item>
 												</q-list>
