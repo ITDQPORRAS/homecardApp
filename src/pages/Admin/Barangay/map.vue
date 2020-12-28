@@ -13,43 +13,45 @@
 
 				<q-scroll-area class="fit">
 					<q-list dense separator>
-						<q-slide-item
+						<q-item
 							v-for="(item, x) in filteredList"
 							:key="x"
-							@left="onLeft(false, ...arguments)"
-							left-color="red"
-							right-color="purple"
+							clickable
+							v-ripple
 						>
-							<template v-slot:left>
-								<q-btn color="red-10" icon="push_pin" @click="notify"></q-btn>
-							</template>
-
-							<q-item clickable v-ripple @click="selected(item)">
-								<q-item-section>
-									{{ item.brgy_name }}
-									<div
-										class="text-weight-thin my-table-details"
-										v-html="item.district"
-									></div>
-								</q-item-section>
-								<q-item-section top side>
-									<div class="text-grey-8 q-gutter-xs">
-										<q-btn size="12px" flat dense round icon="more_vert">
-											<q-menu dense>
-												<q-list dense style="min-width: 300px">
+							<q-item-section @click="selected(item)">
+								{{ item.brgy_name }}
+								<div
+									class="text-weight-thin my-table-details"
+									v-html="item.district"
+								></div>
+							</q-item-section>
+							<q-item-section top side>
+								<div class="text-grey-8 q-gutter-xs">
+									<q-btn size="8px" flat dense round icon="more_vert">
+										<q-popup-proxy
+											transition-show="flip-up"
+											transition-hide="flip-down"
+										>
+											<q-banner class="bg-primary text-white">
+												<q-list dense style="min-width: 200px">
 													<q-item clickable v-close-popup>
-														<q-item-section>Pin Location</q-item-section>
+														<q-item-section @click="assign(item)"
+															>Pin Location</q-item-section
+														>
 													</q-item>
 													<q-item clickable v-close-popup>
-														<q-item-section>Pin Facility</q-item-section>
+														<q-item-section @click="onSelectedFacility(item)"
+															>Pin Facility</q-item-section
+														>
 													</q-item>
 												</q-list>
-											</q-menu>
-										</q-btn>
-									</div>
-								</q-item-section>
-							</q-item>
-						</q-slide-item>
+											</q-banner>
+										</q-popup-proxy>
+									</q-btn>
+								</div>
+							</q-item-section>
+						</q-item>
 					</q-list>
 				</q-scroll-area>
 			</q-drawer>
@@ -334,6 +336,7 @@ export default {
 				this.$message({ message: "No location setup!", type: "error" });
 			}
 		},
+		notify() {},
 	},
 	computed: {
 		// ...mapGetters(["barangay"]),

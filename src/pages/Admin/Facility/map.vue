@@ -34,22 +34,14 @@
 								</q-item-section>
 								<q-item-section top side>
 									<div class="text-grey-8 q-gutter-xs">
-										<q-btn size="8px" flat dense round icon="more_vert">
-											<q-menu
-												dense
-												transition-show="scale"
-												transition-hide="scale"
-											>
-												<q-list dense style="min-width: 100px">
-													<q-item
-														clickable
-														v-close-popup
-														@click="onSelected(item)"
-													>
-														<q-item-section>Pin Location</q-item-section>
-													</q-item>
-												</q-list>
-											</q-menu>
+										<q-btn
+											size="8px"
+											flat
+											dense
+											round
+											icon="more_vert"
+											@click="assign(item)"
+										>
 										</q-btn>
 									</div>
 								</q-item-section>
@@ -134,6 +126,7 @@ export default {
 				{ text: "Action", value: "Action", width: "30px" },
 			],
 			mapData: [],
+			facility: [],
 			maplist: [],
 			marker: [],
 			center: { lng: 123.755822, lat: 10.209696 },
@@ -218,6 +211,7 @@ export default {
 		},
 		async loaded(map) {
 			await this.mapLocation();
+			await this.getFacility();
 			map.addLayer({
 				id: "points",
 				type: "symbol",
@@ -234,22 +228,30 @@ export default {
 					"icon-allow-overlap": true,
 				},
 			});
+			map.addLayer({
+				id: "points",
+				type: "symbol",
+				source: {
+					type: "geojson",
+					data: this.facility.map,
+				},
+				layout: {
+					"icon-image": "{icon}-15",
+					"text-field": "{title}",
+					"text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+					"text-offset": [0, 0.6],
+					"text-anchor": "top",
+					"icon-allow-overlap": true,
+				},
+			});
 			this.marker.forEach((marker) => {
 				new mapboxgl.Marker().setLngLat(marker).addTo(map);
 			});
-			// this.marker.map((marker) => {
-			//   const LngLat = marker;
-			//   const popup = marker.description;
-			//   new mapboxgl.Marker().setLngLat(LngLat).addTo(map);
-			// });
-
-			// this.map = map;
+			this.facility.coordinate.forEach((marker) => {
+				new mapboxgl.Marker({ color: "orange" }).setLngLat(marker).addTo(map);
+			});
 		},
-		zoomend(map, e) {
-			// console.log('Map zoomed');
-			// var center = this.map.getCenter().wrap();
-			// console.log(center);
-		},
+		zoomend(map, e) {},
 
 		onSelected(item) {
 			// this.dlgtag = true;
@@ -258,6 +260,7 @@ export default {
 		},
 
 		async clicked(map, e) {
+			console.log(map);
 			if (e.features) {
 				const coordinates = e.features[0].geometry.coordinates.slice();
 				while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
@@ -276,7 +279,6 @@ export default {
 				}
 				this.title = e.features[0].properties.title;
 				this.loading = true;
-				// this.handleSelect(datax);
 				this.dlgshow = true;
 				this.loading = false;
 				const popup = new mapboxgl.Popup()
@@ -312,6 +314,11 @@ export default {
 			this.maplist = data.list;
 			this.marker = data.coordinate;
 		},
+		async getFacility() {
+			const { data } = await new Resource("Map/facilityList").list();
+			this.facility = data;
+		},
+		notify() {},
 		selected(item) {
 			this.zoom = 18;
 			if (item.lng > 0) {

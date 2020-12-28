@@ -245,8 +245,8 @@ export default {
 					// console.log(authRes);
 					let par = {
 						grant_type: "social",
-						client_id: "5",
-						client_secret: "K3Nzngxw3yHOfEs95qtfr2gawOH4ZY2xFM7BWJe2",
+						client_id: "3",
+						client_secret: "MsiMPwC7EcdGGQ7QqlbR5UvOGXrraJoTkgk8vixa",
 						provider: network,
 						access_token: res.authResponse.access_token,
 					};

@@ -1,16 +1,7 @@
 <template>
 	<div id="app">
 		<q-card>
-			<q-tlbr @back="goHome" :title="mapData.brgy_name">
-				<!-- <q-btn
-					size="sm"
-					rounded
-					color="primary"
-					icon="where_to_vote"
-					label="OK"
-					@click="updateLocation"
-				/> -->
-			</q-tlbr>
+			<q-tlbr @back="goHome" :title="mapData.brgy_name"> </q-tlbr>
 			<div class="row">
 				<div class="col-12 col-md-8">
 					<mapbox
@@ -45,24 +36,56 @@
 								label="Complete Address"
 							/>
 						</div>
+						<div class="col-6">
+							<q-input
+								readonly
+								dense
+								v-model="form.longitude"
+								type="text"
+								label="longitude"
+							/>
+						</div>
+						<div class="col-6">
+							<q-input
+								readonly
+								dense
+								v-model="form.latitude"
+								type="text"
+								label="latitude"
+							/>
+						</div>
 						<div class="col-12 q-gutter-sm">
 							<q-btn
+								v-if="form.longitude > 0"
 								size="sm"
 								color="primary"
 								icon="check"
-								label="OK"
+								:label="form.id > 0 ? 'Update' : 'Save'"
 								@click="onClick"
 							/>
-							<q-btn size="sm" icon="close" label="clear" @click="onClick" />
+							<q-btn size="sm" icon="close" label="clear" @click="clear" />
 						</div>
 						<div class="col-12">
 							<q-table
 								flat
 								title="Facility List"
-								:data="data"
+								:data="list"
 								:columns="columns"
-								row-key="name"
-							/>
+								row-key="id"
+							>
+								<template v-slot:body-cell-complete_address="props">
+									<q-td :props="props">
+										<div class="my-table-details">
+											{{ props.row.complete_address }}
+										</div>
+									</q-td>
+								</template>
+								<template v-slot:body-cell-actions="props">
+									<q-td :props="props">
+										<q-info @edit="edit(props.row)"> </q-info>
+									</q-td>
+								</template>
+							</q-table>
 						</div>
 					</div>
 				</div>
@@ -98,7 +121,13 @@ export default {
 			lngLat: [],
 			columns: [
 				{ label: "Facility Name", field: "facility_name", align: "left" },
-				{ label: "Complete Address", field: "complete_address", align: "left" },
+				{
+					name: "complete_address",
+					label: "Complete Address",
+					field: "complete_address",
+					align: "left",
+				},
+				{ name: "actions", label: "Action", align: "left" },
 			],
 			form: {
 				id: 0,
@@ -108,10 +137,11 @@ export default {
 				longitude: null,
 				latitude: null,
 			},
+			list: [],
 		};
 	},
 	mounted() {
-		// this.mapLocation();
+		this.listData();
 	},
 	created() {
 		if (this.mapData.lng > 0) {
@@ -120,7 +150,6 @@ export default {
 				lat: this.mapData.lat,
 			};
 		}
-
 		this.map = Mapbox;
 	},
 	methods: {
@@ -194,10 +223,6 @@ export default {
 					this.form.complete_address = data.features[0].place_name;
 					this.form.latitude = lat;
 					this.form.longitude = lng;
-					// console.log(par);
-					// console.log(response.features[0].place_name);
-					// $emit("location", response.features[0].place_name);
-					// this.$emit("location", par);
 				});
 		},
 		async onClick() {
@@ -214,17 +239,42 @@ export default {
 						let par = { form: this.form };
 						const { data } = await new Resource("Map/facility").store(par);
 						this.$q.notify(data.Message);
-						if (data.status === "success") {
-							EventBus.$emit("list");
-						}
+						this.listData();
 						this.loading = false;
 					});
 			} catch (error) {
 				this.loading = false;
 			}
 		},
+		async listData() {
+			await new Resource("Map/facilityPerBrgy")
+				.get(this.mapData.id)
+				.then(({ data }) => {
+					this.list = data;
+				});
+		},
 		async showConfirmed() {
 			this.$refs.command.onShow(2);
+		},
+		edit(item) {
+			this.form = {
+				id: item.id,
+				brgy_id: this.mapData.id,
+				facility_name: item.facility_name,
+				complete_address: item.complete_address,
+				longitude: item.longitude,
+				latitude: item.latitude,
+			};
+		},
+		clear() {
+			this.form = {
+				id: 0,
+				brgy_id: this.mapData.id,
+				facility_name: null,
+				complete_address: null,
+				longitude: null,
+				latitude: null,
+			};
 		},
 	},
 };
@@ -233,5 +283,13 @@ export default {
 #map {
 	width: 100%;
 	height: 100vh;
+}
+.my-table-details {
+	font-size: 0.85em;
+	font-style: italic;
+	max-width: 200px;
+	white-space: normal;
+	color: #555;
+	margin-top: 4px;
 }
 </style>

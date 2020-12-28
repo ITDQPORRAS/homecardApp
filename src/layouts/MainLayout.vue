@@ -14,7 +14,9 @@
 							icon="menu"
 							class="q-mx-md"
 						/>
-						<q-toolbar-title>HomeCard</q-toolbar-title>
+						<q-toolbar-title class="cursor-pointer" @click="onHome"
+							>HomeCard</q-toolbar-title
+						>
 						<q-space />
 
 						<div class="q-gutter-sm row items-center no-wrap">
@@ -498,6 +500,9 @@ export default {
 		},
 		onProfile() {
 			this.$router.push("/profile");
+		},
+		onHome() {
+			this.$router.push("/");
 		},
 	},
 	watch: {
