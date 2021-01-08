@@ -32,19 +32,6 @@
 										v-html="item.district"
 									></div>
 								</q-item-section>
-								<q-item-section top side>
-									<div class="text-grey-8 q-gutter-xs">
-										<q-btn
-											size="8px"
-											flat
-											dense
-											round
-											icon="more_vert"
-											@click="assign(item)"
-										>
-										</q-btn>
-									</div>
-								</q-item-section>
 							</q-item>
 						</q-slide-item>
 					</q-list>
@@ -133,40 +120,6 @@ export default {
 			zoom: 16,
 			popup: [],
 			width: 300,
-			items: [
-				{ color: "blue", icon: "mdi-map-marker", title: "Released" },
-				{ color: "green", icon: "mdi-map-marker", title: "Paid" },
-				{ color: "orange", icon: "mdi-map-marker", title: "Uncomplied" },
-				{ color: "yellow", icon: "mdi-map-marker", title: "Partial Payment" },
-				{ color: "brown", icon: "mdi-map-marker", title: "For Assessment" },
-				{ color: "red", icon: "mdi-map-marker", title: "Unpaid" },
-				{ divider: true },
-				{
-					icon: "map",
-					title: "streets",
-					datax: "mapbox://styles/mapbox/streets-v11",
-				},
-				{
-					icon: "map",
-					title: "light",
-					datax: "mapbox://styles/mapbox/light-v10",
-				},
-				{
-					icon: "map",
-					title: "dark",
-					datax: "mapbox://styles/mapbox/dark-v10",
-				},
-				{
-					icon: "map",
-					title: "outdoors",
-					datax: "mapbox://styles/mapbox/outdoors-v11",
-				},
-				{
-					icon: "map",
-					title: "satellite",
-					datax: "mapbox://styles/mapbox/satellite-v9",
-				},
-			],
 			drawer: false,
 			group: null,
 			currentMarkerss: null,
@@ -214,7 +167,7 @@ export default {
 			await this.getFacility();
 			map.addLayer({
 				id: "points",
-				type: "symbol",
+				type: "circle",
 				source: {
 					type: "geojson",
 					data: this.mapData,
@@ -229,7 +182,7 @@ export default {
 				},
 			});
 			map.addLayer({
-				id: "points",
+				id: "points2",
 				type: "symbol",
 				source: {
 					type: "geojson",
@@ -248,7 +201,9 @@ export default {
 				new mapboxgl.Marker().setLngLat(marker).addTo(map);
 			});
 			this.facility.coordinate.forEach((marker) => {
-				new mapboxgl.Marker({ color: "orange" }).setLngLat(marker).addTo(map);
+				new mapboxgl.Marker({ color: "orange", symbol: "2" })
+					.setLngLat(marker)
+					.addTo(map);
 			});
 		},
 		zoomend(map, e) {},
@@ -260,7 +215,6 @@ export default {
 		},
 
 		async clicked(map, e) {
-			console.log(map);
 			if (e.features) {
 				const coordinates = e.features[0].geometry.coordinates.slice();
 				while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
