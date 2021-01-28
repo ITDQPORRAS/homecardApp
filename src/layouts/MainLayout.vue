@@ -426,7 +426,6 @@ export default {
 			this.$q.localStorage.set("ModuleGroup", this.ModuleGroup);
 
 			// this.update_route();
-			// console.log(this.ModuleGroup);
 		},
 		async setProfile() {
 			// const { data } = await new Resource("getProfile").get2(
@@ -485,7 +484,6 @@ export default {
 			await datax.store(par).then(() => {});
 		},
 		checkAccess(path) {
-			// console.log(this.isAdmin);
 			if (this.isAdmin || 0 == 1) {
 				return true;
 			}
