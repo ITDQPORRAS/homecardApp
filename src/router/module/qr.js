@@ -72,6 +72,19 @@ const admin = [
                     access: ['initiate', 'save', 'update', 'view']
                 },
             },
+            {
+                path: '/vaccineSurvey',
+                component: () =>
+                    import ('pages/qr/vaccine'),
+                name: 'Vaccine Survey',
+                icon: 'emoji_nature',
+                meta: {
+                    title: 'Vaccine Survey',
+                    icon: 'science',
+                    requiresAuth: true,
+                    access: ['initiate', 'save', 'update', 'view']
+                },
+            },
         ]
     },
 ]

@@ -137,9 +137,7 @@
 						</q-card-section>
 					</q-card>
 				</q-expansion-item>
-
 				<q-separator />
-
 				<q-expansion-item
 					group="somegroup"
 					icon="attachment"

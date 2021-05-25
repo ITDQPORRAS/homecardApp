@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-btn color="grey-7" size="xs" round flat icon="more_vert">
+    <q-btn color="grey-7" size="xs" round flat :label="label" icon="more_vert">
       <q-menu>
         <q-list style="min-width: 100px">
           <q-item
@@ -58,6 +58,7 @@ export default {
     disabledEdit: { type: Boolean, default: false },
     disabledDel: { type: Boolean, default: false },
     disabledView: { type: Boolean, default: false },
+    		label: { type: String, default: "" },
   },
   methods: {
     edit() {

@@ -59,6 +59,19 @@ const Mod_QR = {
                     name: '/HomeCard/Covid',
                     meta: { title: 'Covid Status', icon: 'emoji_nature', requiresAuth: true, access: ['initiate', 'save', 'update', 'view'] },
                 },
+                {
+                    path: '/vaccineSurvey',
+                    component: () =>
+                        import ('pages/qr/vaccine'),
+                    name: 'Vaccine Survey',
+                    icon: 'emoji_nature',
+                    meta: {
+                        title: 'Vaccine Survey',
+                        icon: 'arrow_right_alt',
+                        requiresAuth: true,
+                        access: ['initiate', 'save', 'update', 'view']
+                    },
+                },
 
             ],
         },
@@ -80,7 +93,14 @@ const Mod_QR = {
                     component: () =>
                         import ('pages/dashboard/household'),
                     name: '/householdMonitoring',
-                    meta: { title: 'Household', icon: 'addchart', requiresAuth: true, access: ['initiate'] },
+                    meta: { title: 'Population', icon: 'addchart', requiresAuth: true, access: ['initiate'] },
+                },
+                {
+                    path: '/householdBarangay',
+                    component: () =>
+                        import ('pages/dashboard/householdBarangay'),
+                    name: 'Barangay Population',
+                    meta: { title: 'Barangay Population', icon: 'addchart', requiresAuth: true, access: ['initiate'] },
                 },
                 {
                     path: '/covidStatus',
@@ -88,6 +108,13 @@ const Mod_QR = {
                         import ('pages/dashboard/covidStatus'),
                     name: '/covidStatus',
                     meta: { title: 'Covid Status', icon: 'bug_report', requiresAuth: true, access: ['initiate'] },
+                },
+                {
+                    path: '/vaccineDash',
+                    component: () =>
+                        import ('pages/dashboard/vaccineDash'),
+                    name: 'Vaccine',
+                    meta: { title: 'Vaccine', icon: 'bug_report', requiresAuth: true, access: ['initiate'] },
                 },
                 {
                     path: '/Tracker',

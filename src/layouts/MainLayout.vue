@@ -302,7 +302,7 @@ export default {
 			routers: [],
 			finalRouter: [],
 			newRoute: [],
-			infox: this.$q.localStorage.getItem("info") || [],
+			infox: this.$q.localStorage.getItem("infoxprcl") || [],
 			Dark: false,
 			Menux: [],
 		};

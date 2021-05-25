@@ -79,20 +79,6 @@
 					row-key="name"
 					dense
 				>
-					<!-- <template v-slot:top-right>
-            <q-input
-              dense
-              rounded
-              debounce="500"
-              style="width:150px"
-              v-model="search"
-              placeholder="Search"
-            >
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
-          </template>-->
 					<template v-slot:body-cell-lastName="props">
 						<q-td :props="props"
 							>{{ props.row.lastName }} {{ props.row.suffix }}</q-td
@@ -178,8 +164,50 @@
 							></q-input>
 						</q-th>
 					</template>
+					<template v-slot:header-cell-groups="props">
+						<q-th :props="props">
+							<q-input
+								v-model="listHeader.groups"
+								:label="props.col.label"
+								type="text"
+								dense
+							></q-input>
+						</q-th>
+					</template>
+					<template v-slot:body-cell-client_guid="props">
+						<q-td :props="props">
+							<info
+								@edit="edit(props.row)"
+								:showEdit="false"
+								@cancel="cancel(props.row)"
+								:showCancel="false"
+								:label="props.row.client_guid"
+							>
+								<q-item
+									clickable
+									v-ripple
+									v-close-popup
+									@click="updateGroup(props.row)"
+								>
+									<q-item-section avatar>
+										<q-icon color="secondary" name="storage" />
+									</q-item-section>
+									<q-item-section>Update Group</q-item-section>
+								</q-item>
+							</info>
+							<!-- {{ props.row.client_guid }} -->
+						</q-td>
+					</template>
 				</q-table>
 			</div>
+			<q-dlg
+				v-model="dlggroups"
+				title="Group"
+				@save="onSaveGroup"
+				:showCommand="false"
+			>
+				<groups :data="selected" ref="groups" @save="onSaveGroup" />
+			</q-dlg>
 		</div>
 	</q-page>
 </template>
@@ -187,10 +215,14 @@
 import Resource from "src/api/resource";
 import countTo from "vue-count-to";
 import { mapGetters } from "vuex";
+import info from "#/Information";
+import groups from "./group";
+import store from "src/store";
 export default {
-	components: { countTo },
+	components: { countTo, info, groups },
 	data() {
 		return {
+			dlggroups: false,
 			title: "Total Population",
 			loading: false,
 			pagination: {
@@ -223,6 +255,7 @@ export default {
 				lastName: "",
 				age: "",
 				member_type: "",
+				groups: "",
 			},
 			columns: [
 				{
@@ -230,6 +263,7 @@ export default {
 					label: "HH No.",
 					field: "client_guid",
 					align: "left",
+					style: "width: 200px",
 					// sortable: true,
 				},
 				{
@@ -282,15 +316,37 @@ export default {
 					align: "left",
 					// sortable: true,
 				},
+				{
+					name: "groups",
+					label: "Groups",
+					field: "groups",
+					align: "left",
+					// sortable: true,
+				},
 			],
 			datax: [],
 			search: "",
 			type: "all",
 			count: 0,
 			countDown: 3,
+			selected: {},
 		};
 	},
 	methods: {
+		async onSaveGroup() {
+			this.$q.loading.show();
+			await new Resource("Dashboard/updateGroup")
+				.store(this.selected)
+				.then(({ data }) => {
+					this.$q.notify(data.Message);
+					this.dlggroups = false;
+					this.$q.loading.hide();
+				});
+		},
+		updateGroup(item) {
+			this.selected = item;
+			this.dlggroups = true;
+		},
 		async onRequest(props) {
 			if (this.countDown == 0) {
 				this.loading = true;
@@ -406,6 +462,7 @@ export default {
 	},
 	mounted() {
 		this.total();
+		store.dispatch("global/getPopulation");
 	},
 	watch: {
 		listHeader: {
@@ -433,9 +490,6 @@ export default {
 	},
 	created() {
 		this.countDownTimer();
-	},
-	beforeCreate() {
-		this.$store.dispatch("global/getPopulation");
 	},
 	computed: {
 		...mapGetters(["populations"]),
